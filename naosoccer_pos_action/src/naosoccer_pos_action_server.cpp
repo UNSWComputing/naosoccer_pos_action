@@ -62,6 +62,9 @@ NaosoccerPosActionServer::NaosoccerPosActionServer(const rclcpp::NodeOptions & o
     std::bind(&NaosoccerPosActionServer::handle_accepted, this, std::placeholders::_1));
 
   this->get_parameter<std::string>("pos_folder", pos_folder_);
+  if (!pos_folder_.empty() && pos_folder_.back() == '/') {
+    pos_folder_.pop_back();
+  }
   bool parse_on_initialise;
   this->get_parameter<bool>("parse_on_initialise", parse_on_initialise);
   if (parse_on_initialise) {
@@ -81,6 +84,11 @@ NaosoccerPosActionServer::~NaosoccerPosActionServer() {}
 
 bool NaosoccerPosActionServer::canParsePosFolder(std::string & folder_path)
 {
+  if (!fs::exists(folder_path) || !fs::is_directory(folder_path)) {
+    RCLCPP_ERROR(this->get_logger(), "Invalid folder path: %s", folder_path.c_str());
+    return false;
+  }
+  bool success = true;
   try {
     for (const auto & entry : fs::recursive_directory_iterator(folder_path)) {
       if (fs::is_regular_file(entry)) {
@@ -90,18 +98,18 @@ bool NaosoccerPosActionServer::canParsePosFolder(std::string & folder_path)
           RCLCPP_DEBUG(this->get_logger(), ("Valid pos file: " + filePath).c_str());
         } else {
           RCLCPP_WARN(this->get_logger(), ("Invalid pos file: " + filePath).c_str());
-          return false;
+          success = false;
         }
       }
     }
   } catch (const fs::filesystem_error & e) {
     RCLCPP_ERROR(this->get_logger(), "Filesystem error %s", e.what());
-    return false;
+    success = false;
   } catch (const std::exception & e) {
     RCLCPP_ERROR(this->get_logger(), "Error: %s", e.what());
-    return false;
+    success = false;
   }
-  return true;
+  return success;
 }
 
 bool NaosoccerPosActionServer::canParsePosFile(std::string & file_path)
@@ -137,6 +145,10 @@ void NaosoccerPosActionServer::readPosFile(std::string & file_path)
 
 std::string NaosoccerPosActionServer::getFullFilePath(std::string & filename)
 {
+  // Support absolute paths too
+  if (fs::path(pos_folder_).is_absolute()) {
+    return (fs::path(pos_folder_) / filename).string();
+  }
   std::string file = pos_folder_ + filename;
   std::string package_share_directory =
     ament_index_cpp::get_package_share_directory("naosoccer_pos_action");
