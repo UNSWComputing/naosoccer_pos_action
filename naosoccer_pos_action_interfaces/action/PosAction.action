@@ -7,4 +7,3 @@ string message
 ---
 # Feedback
 int32 progress
-bool cancel_possible
