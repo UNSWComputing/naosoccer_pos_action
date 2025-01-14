@@ -325,7 +325,7 @@ void NaosoccerPosActionServer::handle_accepted(const std::shared_ptr<ServerGoalH
   std::thread([this, goal_handle]() {execute(goal_handle);}).detach();
 }
 
-void KickServer::execute(const std::shared_ptr<GoalHandleKick> goal_handle)
+void NaosoccerPosActionServer::execute(const std::shared_ptr<ServerGoalHandlePosAction> goal_handle)
 {
   RCLCPP_INFO(this->get_logger(), "Starting Pos Action");
   initial_time_ = rclcpp::Node::now();
