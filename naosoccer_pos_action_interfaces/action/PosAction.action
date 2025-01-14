@@ -3,5 +3,6 @@ string action_name
 ---
 # Result
 bool success
+string message
 ---
 # Feedback

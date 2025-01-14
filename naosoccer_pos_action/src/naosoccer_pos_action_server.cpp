@@ -341,7 +341,7 @@ void NaosoccerPosActionServer::execute(const std::shared_ptr<ServerGoalHandlePos
     result->message = "Pos action completed successfully";
     goal_handle->succeed(result);
     RCLCPP_INFO(this->get_logger(), "Goal succeeded");
-  }
+  };
 
   setPosFinishedCallback(pos_finished_callback);
 
