@@ -86,6 +86,6 @@ private:
   std::mutex mutex_;
 };
 
-}  // namespace naosoccer_pos_action_server_ns
+}  // namespace naosoccer_pos_action_server
 
 #endif  // NAOSOCCER_POS_SERVER__NAOSOCCER_POS_SERVER_HPP_

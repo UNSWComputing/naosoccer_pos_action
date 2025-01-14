@@ -59,7 +59,7 @@ void NaosoccerPosActionNode::action_req_callback(const std_msgs::msg::String::Sh
 }
 
 
-}  // namespace naosoccer_pos_action
+}  // namespace naosoccer_pos_action_node
 
 #include "rclcpp_components/register_node_macro.hpp"
 RCLCPP_COMPONENTS_REGISTER_NODE(naosoccer_pos_action_node::NaosoccerPosActionNode)

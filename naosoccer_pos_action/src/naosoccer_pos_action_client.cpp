@@ -99,4 +99,4 @@ void NaosoccerPosActionNode::result_callback(const ClientGoalHandlePosAction::Wr
   }
 }
 
-}  // namespace naosoccer_pos_action_client_ns
+}  // namespace naosoccer_pos_action_node
