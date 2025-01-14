@@ -44,7 +44,7 @@ NaosoccerPosActionNode::NaosoccerPosActionNode(const rclcpp::NodeOptions & optio
   RCLCPP_INFO(this->get_logger(), "NaosoccerPosActionNode initialized");
 
   // Client
-  this->client_ptr_ = rclcpp_action::create_client<PosAction>(node_, "naosoccer_pos_action");
+  this->client_ptr_ = rclcpp_action::create_client<PosAction>(this, "naosoccer_pos_action");
 
 }
 
