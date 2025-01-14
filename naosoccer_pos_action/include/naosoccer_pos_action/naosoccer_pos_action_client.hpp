@@ -44,7 +44,7 @@ class NaosoccerPosActionClient : public rclcpp::Node
 {
 public:
   using PosAction = naosoccer_pos_interfaces::action::PosAction;
-  using GoalHandlePosAction = rclcpp_action::ClientGoalHandle<PosAction>;
+  using ClientGoalHandlePosAction = rclcpp_action::ClientGoalHandle<PosAction>;
 
   explicit NaosoccerPosActionClient(const rclcpp::NodeOptions& options = rclcpp::NodeOptions{});
   virtual ~NaosoccerPosActionClient();
@@ -53,11 +53,11 @@ private:
   void send_goal(std::string& action_name);
   void action_req_callback(const std_msgs::msg::String::SharedPtr msg);
   void goal_response_callback(
-	  const GoalHandlePosAction::SharedPtr& goal_handle);
-  void feedback_callback(GoalHandlePosAction::SharedPtr,
+	  const ClientGoalHandlePosAction::SharedPtr& goal_handle);
+  void feedback_callback(ClientGoalHandlePosAction::SharedPtr,
 						 const std::shared_ptr<const PosAction::Feedback> feedback);
   void
-  result_callback(const GoalHandlePosAction::WrappedResult& result);
+  result_callback(const ClientGoalHandlePosAction::WrappedResult& result);
 
   rclcpp_action::Client<PosAction>::SharedPtr client_ptr_;
   rclcpp::TimerBase::SharedPtr timer_;
