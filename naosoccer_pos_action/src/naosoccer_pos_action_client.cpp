@@ -53,8 +53,8 @@ void NaosoccerPosActionNode::send_goal(std::string & action_name)
   send_goal_options.goal_response_callback =
     std::bind(&NaosoccerPosActionNode::goal_response_callback, this, _1);
 
-  // send_goal_options.feedback_callback =
-  //   std::bind(&NaosoccerPosActionNode::feedback_callback, this, _1, _2);
+  send_goal_options.feedback_callback =
+    std::bind(&NaosoccerPosActionNode::feedback_callback, this, _1, _2);
 
   send_goal_options.result_callback = std::bind(&NaosoccerPosActionNode::result_callback, this, _1);
 
@@ -73,13 +73,16 @@ void NaosoccerPosActionNode::goal_response_callback(const ClientGoalHandlePosAct
   }
 }
 
-/*
 void NaosoccerPosActionNode::feedback_callback(ClientGoalHandlePosAction::SharedPtr,
                                            const std::shared_ptr<const PosAction::Feedback> feedback)
 {
-  // TODO
+  RCLCPP_INFO(this->get_logger(), "Feedback: progress = %d%%, can cancel? %s", feedback->progress, feedback->cancel_possible ? "true" : "false");
+  // For wrapper node
+  auto feedback_msg = std_msgs::msg::String();
+  feedback_msg.data = std::to_string(feedback->progress);
+  pub_action_feedback_->publish(feedback_msg);
+  //
 }
-*/
 
 void NaosoccerPosActionNode::result_callback(const ClientGoalHandlePosAction::WrappedResult & result)
 {

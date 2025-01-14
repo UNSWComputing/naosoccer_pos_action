@@ -38,7 +38,7 @@ NaosoccerPosActionNode::NaosoccerPosActionNode(const rclcpp::NodeOptions & optio
 {
   sub_action_req_ = this->create_subscription<std_msgs::msg::String>(
     "action_req", 1, std::bind(&NaosoccerPosActionNode::action_req_callback, this, std::placeholders::_1));
-
+  pub_action_feedback_ = this->create_publisher<std_msgs::msg::String>("action_feedback", 10);
   pub_action_finished_ = this->create_publisher<std_msgs::msg::String>("action_finished", 10);
 
   RCLCPP_INFO(this->get_logger(), "NaosoccerPosActionNode initialized");
