@@ -359,7 +359,6 @@ void NaosoccerPosActionServer::execute(const std::shared_ptr<ServerGoalHandlePos
     int time_ms = (rclcpp::Node::now() - initial_time_).nanoseconds() / 1e6;
     const auto pos_time = key_frames_.back().t_ms;
     feedback->progress = time_ms/pos_time;
-    feedback->cancel_possible = true;
     goal_handle->publish_feedback(feedback);
     RCLCPP_INFO(this->get_logger(), "Feedback: progress = %d%%", feedback->progress);
 

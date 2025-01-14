@@ -76,7 +76,7 @@ void NaosoccerPosActionNode::goal_response_callback(const ClientGoalHandlePosAct
 void NaosoccerPosActionNode::feedback_callback(ClientGoalHandlePosAction::SharedPtr,
                                            const std::shared_ptr<const PosAction::Feedback> feedback)
 {
-  RCLCPP_INFO(this->get_logger(), "Feedback: progress = %d%%, can cancel? %s", feedback->progress, feedback->cancel_possible ? "true" : "false");
+  RCLCPP_INFO(this->get_logger(), "Feedback: progress = %d%%", feedback->progress);
   // For wrapper node
   auto feedback_msg = std_msgs::msg::String();
   feedback_msg.data = std::to_string(feedback->progress);
