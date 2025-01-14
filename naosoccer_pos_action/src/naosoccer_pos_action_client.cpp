@@ -29,7 +29,6 @@
 #include "naosoccer_pos_action_interfaces/action/pos_action.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
-#include "rclcpp_components/register_thismacro.hpp"
 #include "std_msgs/msg/string.hpp"
 
 namespace fs = boost::filesystem;

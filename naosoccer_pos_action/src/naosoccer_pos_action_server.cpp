@@ -134,7 +134,7 @@ void NaosoccerPosActionServer::readPosFile(std::string & file_path)
 
 std::string NaosoccerPosActionServer::getFullFilePath(std::string & filename)
 {
-  std::string file = folder_ + filename;
+  std::string file = pos_folder_ + filename;
   std::string package_share_directory =
     ament_index_cpp::get_package_share_directory("naosoccer_pos_action");
 
