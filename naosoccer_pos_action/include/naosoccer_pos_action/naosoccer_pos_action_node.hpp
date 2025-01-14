@@ -45,7 +45,7 @@ public:
 private:
   void action_req_callback(const std_msgs::msg::String::SharedPtr msg);
   rclcpp::Subscription<std_msgs::msg::String>::SharedPtr action_req_sub_;
-  rclcpp::Publisher<std::string>::SharedPtr action_finished_pub_;
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr action_finished_pub_;
 
 // Client
 public:

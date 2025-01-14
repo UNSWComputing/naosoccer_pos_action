@@ -80,7 +80,7 @@ bool NaosoccerPosActionServer::canParsePosFolder(std::string & folder_path)
 {
   try {
     for (const auto &entry : fs::recursive_directory_iterator(folder_path)) {
-      if (std::filesystem::is_regular_file(entry)) {
+      if (fs::is_regular_file(entry)) {
         std::string filePath = entry.path().string();
         bool isValid = canParsePosFile(filePath);
         if (isValid) {
@@ -92,10 +92,10 @@ bool NaosoccerPosActionServer::canParsePosFolder(std::string & folder_path)
       }
     }
   } catch (const fs::filesystem_error &e) {
-      RCLCPP_ERROR(this->get_logger(), "Filesystem error" + e.what());
+      RCLCPP_ERROR(this->get_logger(), "Filesystem error %s", e.what());
       return false;
   } catch (const std::exception &e) {
-      RCLCPP_ERROR(this->get_logger(), "Error: " + e.what());
+      RCLCPP_ERROR(this->get_logger(), "Error: %s", e.what());
       return false;
   }
   return true;
@@ -220,14 +220,14 @@ void NaosoccerPosActionServer::calculateEffectorJoints(
     return;
   }
 
-  if (firstTickSinceActionStarted) {
+  if (firstTickSinceActionStarted_) {
     nao_lola_command_msgs::msg::JointPositions command;
     command.indexes = indexes::indexes;
     command.positions = std::vector<float>(
       sensor_joints.positions.begin(), sensor_joints.positions.end());
     keyFrameStart =
       std::make_unique<KeyFrame>(0, command, nao_lola_command_msgs::msg::JointStiffnesses{});
-    firstTickSinceActionStarted = false;
+    firstTickSinceActionStarted_ = false;
   }
 
   RCLCPP_DEBUG(this->get_logger(), ("time_ms is: " + std::to_string(time_ms)).c_str());
