@@ -167,6 +167,47 @@ float NaosoccerPosActionServer::findElem(
   return NAN;
 }
 
+const KeyFrame & NaosoccerPosActionServer::findPreviousKeyFrame(int time_ms)
+{
+  for (auto it = key_frames_.rbegin(); it != key_frames_.rend(); ++it) {
+    const auto & keyFrame = *it;
+    int keyFrameDeadline = keyFrame.t_ms;
+    if (time_ms >= keyFrameDeadline) {
+      return keyFrame;
+    }
+  }
+
+  return *key_frame_start_;
+}
+
+const KeyFrame & NaosoccerPosActionServer::findNextKeyFrame(int time_ms)
+{
+  for (const auto & keyFrame : key_frames_) {
+    int keyFrameDeadline = keyFrame.t_ms;
+    if (time_ms < keyFrameDeadline) {
+      return keyFrame;
+    }
+  }
+
+  RCLCPP_ERROR(this->get_logger(), "findKeyFrame: Should never reach here");
+  return key_frames_.back();
+}
+
+bool NaosoccerPosActionServer::posFinished(int time_ms)
+{
+  if (key_frames_.size() == 0) {
+    return true;
+  }
+
+  const auto lastKeyFrame = key_frames_.back();
+  int lastKeyFrameTime = lastKeyFrame.t_ms;
+  if (time_ms >= lastKeyFrameTime) {
+    return true;
+  }
+
+  return false;
+}
+
 void NaosoccerPosActionServer::calculateEffectorJoints(
   nao_lola_sensor_msgs::msg::JointPositions & sensor_joints)
 {
@@ -271,47 +312,6 @@ void NaosoccerPosActionServer::calculateEffectorJoints(
   pub_joint_stiffnesses_->publish(effector_joints_stiff);
   RCLCPP_DEBUG(
     this->get_logger(), "published to /effectors/joint_positions and /effectors/joint_stiffnesses");
-}
-
-const KeyFrame & NaosoccerPosActionServer::findPreviousKeyFrame(int time_ms)
-{
-  for (auto it = key_frames_.rbegin(); it != key_frames_.rend(); ++it) {
-    const auto & keyFrame = *it;
-    int keyFrameDeadline = keyFrame.t_ms;
-    if (time_ms >= keyFrameDeadline) {
-      return keyFrame;
-    }
-  }
-
-  return *key_frame_start_;
-}
-
-const KeyFrame & NaosoccerPosActionServer::findNextKeyFrame(int time_ms)
-{
-  for (const auto & keyFrame : key_frames_) {
-    int keyFrameDeadline = keyFrame.t_ms;
-    if (time_ms < keyFrameDeadline) {
-      return keyFrame;
-    }
-  }
-
-  RCLCPP_ERROR(this->get_logger(), "findKeyFrame: Should never reach here");
-  return key_frames_.back();
-}
-
-bool NaosoccerPosActionServer::posFinished(int time_ms)
-{
-  if (key_frames_.size() == 0) {
-    return true;
-  }
-
-  const auto lastKeyFrame = key_frames_.back();
-  int lastKeyFrameTime = lastKeyFrame.t_ms;
-  if (time_ms >= lastKeyFrameTime) {
-    return true;
-  }
-
-  return false;
 }
 
 rclcpp_action::GoalResponse NaosoccerPosActionServer::handleGoal(
