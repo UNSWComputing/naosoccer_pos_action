@@ -53,9 +53,9 @@ NaosoccerPosActionServer::NaosoccerPosActionServer(const rclcpp::NodeOptions & o
 
   action_server_ = rclcpp_action::create_server<PosAction>(
     this, "naosoccer_pos_action",
-    std::bind(&NaosoccerPosActionServer::handleGoal, this, std::placeholders::_1, std::placeholders::_2),
-    std::bind(&NaosoccerPosActionServer::handleCancel, this, std::placeholders::_1),
-    std::bind(&NaosoccerPosActionServer::handleAccepted, this, std::placeholders::_1));
+    std::bind(&NaosoccerPosActionServer::handle_goal, this, std::placeholders::_1, std::placeholders::_2),
+    std::bind(&NaosoccerPosActionServer::handle_cancel, this, std::placeholders::_1),
+    std::bind(&NaosoccerPosActionServer::handle_accepted, this, std::placeholders::_1));
 
   this->get_parameter<std::string>("pos_folder", pos_folder_);
   bool parse_on_initialise;
@@ -282,7 +282,7 @@ void NaosoccerPosActionServer::calculateEffectorJoints(
   pub_joint_stiffnesses->publish(nextKeyFrame.stiffnesses);
 }
 
-rclcpp_action::GoalResponse NaosoccerPosActionServer::handleGoal(
+rclcpp_action::GoalResponse NaosoccerPosActionServer::handle_goal(
   const rclcpp_action::GoalUUID & uuid,
   std::shared_ptr<const PosAction::Goal> goal)
 {
@@ -305,7 +305,7 @@ rclcpp_action::GoalResponse NaosoccerPosActionServer::handleGoal(
   return rclcpp_action::GoalResponse::REJECT;
 }
 
-rclcpp_action::CancelResponse NaosoccerPosActionServer::handleCancel(
+rclcpp_action::CancelResponse NaosoccerPosActionServer::handle_cancel(
   const std::shared_ptr<rclcpp_action::ServerGoalHandle<PosAction>>
     goal_handle)
 {
@@ -317,7 +317,7 @@ rclcpp_action::CancelResponse NaosoccerPosActionServer::handleCancel(
   return rclcpp_action::CancelResponse::ACCEPT;
 }
 
-void NaosoccerPosActionServer::handleAccepted(
+void NaosoccerPosActionServer::handle_accepted(
   const std::shared_ptr<rclcpp_action::ServerGoalHandle<PosAction>>
     goal_handle)
 {

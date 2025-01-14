@@ -56,11 +56,11 @@ private:
 
   void calculateEffectorJoints(nao_lola_sensor_msgs::msg::JointPositions& sensor_joints);
 
-  rclcpp_action::GoalResponse handleGoal(const rclcpp_action::GoalUUID& uuid,
+  rclcpp_action::GoalResponse handle_goal(const rclcpp_action::GoalUUID& uuid,
                                          std::shared_ptr<const PosAction::Goal> goal);
   rclcpp_action::CancelResponse
-  handleCancel(const std::shared_ptr<rclcpp_action::ServerGoalHandle<PosAction>> goal_handle);
-  void handleAccepted(
+  handle_cancel(const std::shared_ptr<rclcpp_action::ServerGoalHandle<PosAction>> goal_handle);
+  void handle_accepted(
       const std::shared_ptr<rclcpp_action::ServerGoalHandle<PosAction>> goal_handle);
 
   rclcpp::Subscription<nao_lola_sensor_msgs::msg::JointPositions>::SharedPtr sub_joint_states_;
