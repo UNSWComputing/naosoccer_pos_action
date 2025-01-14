@@ -86,7 +86,9 @@ void NaosoccerPosActionNode::result_callback(const ClientGoalHandlePosAction::Wr
   switch (result.code) {
     case rclcpp_action::ResultCode::SUCCEEDED:
       RCLCPP_INFO(this->get_logger(), "Joints posisitions regulary played.");
+      // For wrapper node
       pub_action_finished_->publish(std_msgs::msg::String());
+      //
       return;
     case rclcpp_action::ResultCode::ABORTED:
       RCLCPP_ERROR(this->get_logger(), " nao pos Goal was aborted");
