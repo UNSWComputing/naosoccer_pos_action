@@ -86,6 +86,7 @@ void NaosoccerPosActionNode::result_callback(const ClientGoalHandlePosAction::Wr
   switch (result.code) {
     case rclcpp_action::ResultCode::SUCCEEDED:
       RCLCPP_INFO(this->get_logger(), "Joints posisitions regulary played.");
+      pub_action_finished_->publish(std_msgs::msg::String());
       return;
     case rclcpp_action::ResultCode::ABORTED:
       RCLCPP_ERROR(this->get_logger(), " nao pos Goal was aborted");
@@ -108,7 +109,6 @@ void NaosoccerPosActionNode::send_kick_cancel()
 
   RCLCPP_INFO(this->get_logger(), "Sending cancel request for kick...");
 
-  // Cancel the ongoing goal
   client_ptr_->async_cancel_all_goals(
     std::bind(&NaosoccerPosActionNode::kick_cancel_response_callback, this, std::placeholders::_1)
   );
