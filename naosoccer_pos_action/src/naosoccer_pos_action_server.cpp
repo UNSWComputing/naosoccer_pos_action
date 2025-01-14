@@ -271,6 +271,18 @@ void NaosoccerPosActionServer::calculateEffectorJoints(
 void NaosoccerPosActionServer::handlePosFinished() {
   pos_in_action_ = false;
   RCLCPP_DEBUG(this->get_logger(), "Pos finished");
+
+  std::function<void()> callback;
+
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    callback = std::move(pos_finished_callback_);
+    unsetPosFinishedCallback();
+  }
+
+  if (callback) {
+    callback();
+  }
 }
 
 rclcpp_action::GoalResponse NaosoccerPosActionServer::handle_goal(
@@ -318,24 +330,36 @@ void KickServer::execute(const std::shared_ptr<GoalHandleKick> goal_handle)
   initial_time_ = rclcpp::Node::now();
   pos_in_action_ = true;
   firstTickSinceActionStarted_ = true;
+  rclcpp::Rate loop_rate(5);  // 5 Hz, or 200ms
 
   auto feedback = std::make_shared<PosAction::Feedback>();
   auto result = std::make_shared<PosAction::Result>();
+
+  auto pos_finished_callback = [this, goal_handle, result]() {
+    result->success = true;
+    result->message = "Pos action completed successfully";
+    goal_handle->succeed(result);
+    RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+  }
+
+  setPosFinishedCallback(pos_finished_callback);
 
   while (pos_in_action_ && rclcpp::ok()) {
     if (goal_handle->is_canceling()) {
       result->success = false;
       result->message = "pos action was canceled.";
       goal_handle->canceled(result);
+      unsetPosFinishedCallback();
       RCLCPP_DEBUG(this->get_logger(), "pos action goal canceled");
       return;
     }
-
+    // feedback logic
     // feedback->progress = i;
     // feedback->cancel_possible = true;
     // goal_handle->publish_feedback(feedback);
     // RCLCPP_INFO(this->get_logger(), "Feedback: progress = %d%%", feedback->progress);
-    // std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    loop_rate.sleep();
   }
   if (rclcpp::ok()) {
     result->success = true;
@@ -346,8 +370,21 @@ void KickServer::execute(const std::shared_ptr<GoalHandleKick> goal_handle)
     result->success = false;
     result->message = "pos action was aborted.";
     goal_handle->abort(result);
+    unsetPosFinishedCallback();
     RCLCPP_ERROR(this->get_logger(), "Goal aborted");
   }
+}
+
+void NaosoccerPosActionServer::setPosFinishedCallback(std::function<void()> callback)
+{
+  std::lock_guard<std::mutex> lock(mutex_);
+  pos_finished_callback_ = std::move(callback);
+}
+
+void NaosoccerPosActionServer::unsetPosFinishedCallback()
+{
+  std::lock_guard<std::mutex> lock(mutex_);
+  pos_finished_callback_ = nullptr;
 }
 
 }  // namespace naosoccer_pos_action_server_ns

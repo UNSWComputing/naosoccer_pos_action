@@ -64,6 +64,10 @@ private:
   void handle_accepted(
       const std::shared_ptr<ServerGoalHandlePosAction> goal_handle);
 
+  void setPosFinishedCallback(std::function<void()> callback);
+  void unsetPosFinishedCallback();
+  std::function<void()> pos_finished_callback_;
+
   rclcpp::Subscription<nao_lola_sensor_msgs::msg::JointPositions>::SharedPtr sub_joint_states_;
   rclcpp::Publisher<nao_lola_command_msgs::msg::JointPositions>::SharedPtr pub_joint_positions_;
   rclcpp::Publisher<nao_lola_command_msgs::msg::JointStiffnesses>::SharedPtr pub_joint_stiffnesses_;
