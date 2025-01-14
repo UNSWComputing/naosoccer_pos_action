@@ -38,9 +38,10 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   nao_lola_command_msgs
   std_msgs)
 
-# Build
+# Build Node
 add_library(${PROJECT_NAME}_node SHARED
   src/naosoccer_pos_action_node.cpp
+  src/naosoccer_pos_action_client.cpp
   src/parser.cpp)
 target_include_directories(${PROJECT_NAME}_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -49,6 +50,23 @@ target_include_directories(${PROJECT_NAME}_node PUBLIC
 rclcpp_components_register_node(${PROJECT_NAME}_node
   PLUGIN "naosoccer_pos_action::NaosoccerPosActionNode"
   EXECUTABLE ${PROJECT_NAME})
+
+ament_target_dependencies(${PROJECT_NAME}_node ${THIS_PACKAGE_INCLUDE_DEPENDS})
+
+ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
+ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
+
+# Build Server
+add_library(${PROJECT_NAME}_node SHARED
+  src/nao_pos_action_server.cpp
+  src/parser.cpp)
+target_include_directories(${PROJECT_NAME}_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+rclcpp_components_register_node(${PROJECT_NAME}_node
+  PLUGIN "nao_pos_action_server::NaoPosActionServer"
+  EXECUTABLE nao_pos_action_server)
 
 ament_target_dependencies(${PROJECT_NAME}_node ${THIS_PACKAGE_INCLUDE_DEPENDS})
 

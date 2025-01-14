@@ -391,4 +391,4 @@ void NaosoccerPosActionServer::unsetPosFinishedCallback()
 }  // namespace naosoccer_pos_action_server_ns
 
 #include "rclcpp_components/register_node_macro.hpp"
-RCLCPP_COMPONENTS_REGISTER_NODE(naosoccer_pos_action_server_ns::NaosoccerPosActionServer)
+RCLCPP_COMPONENTS_REGISTER_NODE(naosoccer_pos_action_server::NaosoccerPosActionServer)
