@@ -225,7 +225,7 @@ void NaosoccerPosActionServer::calculateEffectorJoints(
     command.indexes = indexes::indexes;
     command.positions = std::vector<float>(
       sensor_joints.positions.begin(), sensor_joints.positions.end());
-    keyFrameStart =
+    key_frame_start_ =
       std::make_unique<KeyFrame>(0, command, nao_lola_command_msgs::msg::JointStiffnesses{});
     firstTickSinceActionStarted_ = false;
   }
@@ -265,8 +265,8 @@ void NaosoccerPosActionServer::calculateEffectorJoints(
       std::to_string(effector_joints.positions.at(i))).c_str());
   }
 
-  pub_joint_positions->publish(effector_joints);
-  pub_joint_stiffnesses->publish(nextKeyFrame.stiffnesses);
+  pub_joint_positions_->publish(effector_joints);
+  pub_joint_stiffnesses_->publish(nextKeyFrame.stiffnesses);
 }
 
 void NaosoccerPosActionServer::handlePosFinished() {

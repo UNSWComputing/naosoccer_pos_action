@@ -65,6 +65,7 @@ private:
   void handle_accepted(
       const std::shared_ptr<ServerGoalHandlePosAction> goal_handle);
   void handlePosFinished();
+  void execute(const std::shared_ptr<ServerGoalHandlePosAction> goal_handle);
 
   void setPosFinishedCallback(std::function<void()> callback);
   void unsetPosFinishedCallback();
