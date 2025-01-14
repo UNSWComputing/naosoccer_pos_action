@@ -39,38 +39,38 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   std_msgs)
 
 # Build Node
-add_library(${PROJECT_NAME}_node SHARED
+add_library(naosoccer_pos_action_node SHARED
   src/naosoccer_pos_action_node.cpp
   src/naosoccer_pos_action_client.cpp
   src/parser.cpp)
-target_include_directories(${PROJECT_NAME}_node PUBLIC
+target_include_directories(naosoccer_pos_action_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
-rclcpp_components_register_node(${PROJECT_NAME}_node
+rclcpp_components_register_node(naosoccer_pos_action_node
   PLUGIN "naosoccer_pos_action::NaosoccerPosActionNode"
-  EXECUTABLE ${PROJECT_NAME})
+  EXECUTABLE naosoccer_pos_action)
 
-ament_target_dependencies(${PROJECT_NAME}_node ${THIS_PACKAGE_INCLUDE_DEPENDS})
+ament_target_dependencies(naosoccer_pos_action_node ${THIS_PACKAGE_INCLUDE_DEPENDS})
 
-ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
+ament_export_targets(export_naosoccer_pos_action HAS_LIBRARY_TARGET)
 ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
 
 # Build Server
-add_library(${PROJECT_NAME}_node SHARED
-  src/nao_pos_action_server.cpp
+add_library(naosoccer_pos_action_server SHARED
+  src/naosoccer_pos_action_server.cpp
   src/parser.cpp)
-target_include_directories(${PROJECT_NAME}_node PUBLIC
+target_include_directories(naosoccer_pos_action_server PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
-rclcpp_components_register_node(${PROJECT_NAME}_node
+rclcpp_components_register_node(naosoccer_pos_action_server
   PLUGIN "nao_pos_action_server::NaoPosActionServer"
   EXECUTABLE nao_pos_action_server)
 
-ament_target_dependencies(${PROJECT_NAME}_node ${THIS_PACKAGE_INCLUDE_DEPENDS})
+ament_target_dependencies(naosoccer_pos_action_server ${THIS_PACKAGE_INCLUDE_DEPENDS})
 
-ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
+ament_export_targets(export_naosoccer_pos_action_server HAS_LIBRARY_TARGET)
 ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
 
 # Install
@@ -78,7 +78,7 @@ install(
   DIRECTORY include/
   DESTINATION include)
 install(
-  TARGETS ${PROJECT_NAME}_node
+  TARGETS naosoccer_pos_action_node naosoccer_pos_action_server
   EXPORT export_${PROJECT_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
