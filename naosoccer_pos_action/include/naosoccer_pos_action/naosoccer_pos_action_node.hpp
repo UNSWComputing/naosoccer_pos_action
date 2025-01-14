@@ -31,6 +31,7 @@
 #include "rclcpp/time.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "naosoccer_pos_action_interfaces/action/pos_action.hpp"
+#include "std_msgs/msg/string.hpp"
 
 
 namespace naosoccer_pos_action_node

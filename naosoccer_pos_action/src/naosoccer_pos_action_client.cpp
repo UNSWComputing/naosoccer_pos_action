@@ -29,7 +29,7 @@
 #include "naosoccer_pos_action_interfaces/action/pos_action.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
-#include "rclcpp_components/register_node_macro.hpp"
+#include "rclcpp_components/register_thismacro.hpp"
 #include "std_msgs/msg/string.hpp"
 
 namespace fs = boost::filesystem;
@@ -42,7 +42,7 @@ void NaosoccerPosActionNode::send_goal(std::string & action_name)
   using namespace std::placeholders;
 
   if (!this->client_ptr_->wait_for_action_server(std::chrono::seconds(5))) {
-    RCLCPP_ERROR(node_->get_logger(), "Action server not available after waiting 5 seconds");
+    RCLCPP_ERROR(this->get_logger(), "Action server not available after waiting 5 seconds");
     rclcpp::shutdown();
   }
 
@@ -60,7 +60,7 @@ void NaosoccerPosActionNode::send_goal(std::string & action_name)
   send_goal_options.result_callback = std::bind(&NaosoccerPosActionNode::result_callback, this, _1);
 
   RCLCPP_INFO(
-    node_->get_logger(), ("Sending goal request for pos file:  " + action_name + ".pos").c_str());
+    this->get_logger(), ("Sending goal request for pos file:  " + action_name + ".pos").c_str());
 
   this->client_ptr_->async_send_goal(goal_msg, send_goal_options);
 }
@@ -68,9 +68,9 @@ void NaosoccerPosActionNode::send_goal(std::string & action_name)
 void NaosoccerPosActionNode::goal_response_callback(const ClientGoalHandlePosAction::SharedPtr & goal_handle)
 {
   if (!goal_handle) {
-    RCLCPP_ERROR(node_->get_logger(), "Goal was rejected by server");
+    RCLCPP_ERROR(this->get_logger(), "Goal was rejected by server");
   } else {
-    RCLCPP_INFO(node_->get_logger(), "Goal accepted by server, waiting for result");
+    RCLCPP_INFO(this->get_logger(), "Goal accepted by server, waiting for result");
   }
 }
 
@@ -86,16 +86,16 @@ void NaosoccerPosActionNode::result_callback(const ClientGoalHandlePosAction::Wr
 {
   switch (result.code) {
     case rclcpp_action::ResultCode::SUCCEEDED:
-      RCLCPP_INFO(node_->get_logger(), "Joints posisitions regulary played.");
+      RCLCPP_INFO(this->get_logger(), "Joints posisitions regulary played.");
       return;
     case rclcpp_action::ResultCode::ABORTED:
-      RCLCPP_ERROR(node_->get_logger(), " nao pos Goal was aborted");
+      RCLCPP_ERROR(this->get_logger(), " nao pos Goal was aborted");
       return;
     case rclcpp_action::ResultCode::CANCELED:
-      RCLCPP_ERROR(node_->get_logger(), " nao pos Goal was canceled");
+      RCLCPP_ERROR(this->get_logger(), " nao pos Goal was canceled");
       return;
     default:
-      RCLCPP_ERROR(node_->get_logger(), " nao pos Unknown result code");
+      RCLCPP_ERROR(this->get_logger(), " nao pos Unknown result code");
       return;
   }
 }
