@@ -54,6 +54,8 @@ NaosoccerPosActionServer::NaosoccerPosActionServer(const rclcpp::NodeOptions & o
     std::bind(&NaosoccerPosActionServer::handleCancel, this, std::placeholders::_1),
     std::bind(&NaosoccerPosActionServer::handleAccepted, this, std::placeholders::_1));
 
+  this->get_parameter_or<std::string>("pos_folder", folder_, "pos/");
+
   RCLCPP_INFO(this->get_logger(), "naosoccer_pos_action_server_node initialized");
 }
 
@@ -77,7 +79,7 @@ void NaosoccerPosActionServer::readPosFile(std::string & filePath)
 
 std::string NaosoccerPosActionServer::getFullFilePath(std::string & filename)
 {
-  std::string file = "pos/" + filename;
+  std::string file = folder_ + filename;
   std::string package_share_directory =
     ament_index_cpp::get_package_share_directory("naosoccer_pos_action");
 

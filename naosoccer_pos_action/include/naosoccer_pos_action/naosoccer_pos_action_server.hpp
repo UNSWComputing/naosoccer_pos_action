@@ -64,6 +64,7 @@ private:
 
   rclcpp_action::Server<naosoccer_pos_interfaces::action::PosPlay>::SharedPtr action_server_;
 
+  std::string folder_;
   bool file_successfully_read_ = false;
   std::vector<KeyFrame> key_frames_;
   std::atomic<bool> pos_in_action_;
