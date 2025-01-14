@@ -44,14 +44,15 @@ public:
 private:
   bool canParsePosFolder(std::string& folder_path);
   bool canParsePosFile(std::string& file_path);
+  void readPosFile(std::string& file_path);
   std::string getFullFilePath(std::string& filename);
   std::vector<std::string> readLines(std::ifstream& ifstream);
-  void calculateEffectorJoints(nao_lola_sensor_msgs::msg::JointPositions& sensor_joints);
+  float findElem(const std::vector<uint8_t>& indexes, const std::vector<float>& data, uint8_t joint);
   const KeyFrame& findPreviousKeyFrame(int time_ms);
   const KeyFrame& findNextKeyFrame(int time_ms);
   bool posFinished(int time_ms);
-  void readPosFile(std::string& file_path);
-  float findElem(const std::vector<uint8_t>& indexes, const std::vector<float>& data, uint8_t joint);
+  
+  void calculateEffectorJoints(nao_lola_sensor_msgs::msg::JointPositions& sensor_joints);
 
   rclcpp_action::GoalResponse handleGoal(const rclcpp_action::GoalUUID& uuid,
                                          std::shared_ptr<const naosoccer_pos_interfaces::action::PosPlay::Goal> goal);
