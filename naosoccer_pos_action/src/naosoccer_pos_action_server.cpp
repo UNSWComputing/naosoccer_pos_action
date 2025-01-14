@@ -35,6 +35,9 @@ namespace naosoccer_pos_action_server_ns
 NaosoccerPosActionServer::NaosoccerPosActionServer(const rclcpp::NodeOptions & options)
 : rclcpp::Node{"naosoccer_pos_action_server_node", options}, pos_in_action_(false)
 {
+  this->declare_parameter<std::string>("pos_folder", "pos/");
+  this->declare_parameter<bool>("parse_on_initialise", true);
+
   pub_joint_positions_ = create_publisher<nao_lola_command_msgs::msg::JointPositions>(
     "/effectors/joint_positions", rclcpp::SensorDataQoS());
   pub_joint_stiffnesses_ = create_publisher<nao_lola_command_msgs::msg::JointStiffnesses>(
@@ -54,12 +57,63 @@ NaosoccerPosActionServer::NaosoccerPosActionServer(const rclcpp::NodeOptions & o
     std::bind(&NaosoccerPosActionServer::handleCancel, this, std::placeholders::_1),
     std::bind(&NaosoccerPosActionServer::handleAccepted, this, std::placeholders::_1));
 
-  this->get_parameter_or<std::string>("pos_folder", folder_, "pos/");
+  this->get_parameter<std::string>("pos_folder", pos_folder_);
+  bool parse_on_initialise;
+  this->get_parameter<bool>("parse_on_initialise", parse_on_initialise);
+  if (parse_on_initialise) {
+    if (canParsePosFolder()) {
+      RCLCPP_INFO(this->get_logger(), "Successfully parsed pos folder");
+    } else {
+      RCLCPP_ERROR(this->get_logger(), "Failed to parse pos folder");
+    }
+  } else {
+    RCLCPP_WARN(this->get_logger(), "Skipping parse on initialise");
+  }
 
   RCLCPP_INFO(this->get_logger(), "naosoccer_pos_action_server_node initialized");
 }
 
 NaosoccerPosActionServer::~NaosoccerPosActionServer() {}
+
+bool NaosoccerPosActionServer::canParsePosFolder()
+{
+  try {
+    for (const auto &entry : fs::recursive_directory_iterator(pos_folder_)) {
+      if (entry.is_regular_file()) {
+        std::string filePath = entry.path().string();
+        bool isValid = parsePosFile(filePath);
+        if (isValid) {
+            RCLCPP_DEBUG(this->get_logger(), ("Valid pos file: " + filePath).c_str());
+        } else {
+            RCLCPP_WARN(this->get_logger(), ("Invalid pos file: " + filePath).c_str());
+            return false;
+        }
+      }
+    }
+  } catch (const fs::filesystem_error &e) {
+      RCLCPP_ERROR(this->get_logger(), "Filesystem error" + e.what().c_str());
+      return false;
+  } catch (const std::exception &e) {
+      RCLCPP_ERROR(this->get_logger(), "Error: " + e.what().c_str());
+      return false;
+  }
+  return true;
+}
+
+bool NaosoccerPosActionServer::canParsePosFile(std::string & filePath)
+{
+  std::ifstream ifstream(filePath);
+  if (ifstream.is_open()) {
+    auto lines = readLines(ifstream);
+    auto parseResult = parser::parse(lines);
+    if (parseResult.successful) {
+      return true;
+    }
+  } else {
+    RCLCPP_ERROR(this->get_logger(), ("Could not open file:  " + filePath).c_str());
+  }
+  return false;
+}
 
 void NaosoccerPosActionServer::readPosFile(std::string & filePath)
 {
