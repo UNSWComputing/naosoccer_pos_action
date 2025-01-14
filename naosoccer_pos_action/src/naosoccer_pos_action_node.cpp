@@ -30,20 +30,38 @@
 
 namespace fs = boost::filesystem;
 
-namespace naosoccer_pos_action
+namespace naosoccer_pos_action_node
 {
 
 NaosoccerPosActionNode::NaosoccerPosActionNode(const rclcpp::NodeOptions & options)
 : rclcpp::Node{"NaosoccerPosActionNode", options}
 {
+  this->action_req_sub_ = this->create_subscription<std_msgs::msg::String>(
+    "action_req", 1, std::bind(&NaosoccerPosActionClient::action_req_callback, this, _1));
 
+  this->action_finished_pub_ = this->create_publisher<std::string>("action_finished", 10);
+
+  RCLCPP_INFO(this->get_logger(), "NaosoccerPosActionNode initialized");
+
+  // Client
+  this->client_ptr_ = rclcpp_action::create_client<PosAction>(node_, "naosoccer_pos_action");
 
 }
 
 NaosoccerPosActionNode::~NaosoccerPosActionNode() {}
+
+void NaosoccerPosActionNode::action_req_callback(const std_msgs::msg::String::SharedPtr msg)
+{
+  RCLCPP_DEBUG(this->get_logger(), "I heard: '%s'", msg->data.c_str());
+
+  std::string action_name = msg->data;
+  NaosoccerPosActionClient::send_goal(action_name);
+}
 
 
 }  // namespace naosoccer_pos_action
 
 #include "rclcpp_components/register_node_macro.hpp"
 RCLCPP_COMPONENTS_REGISTER_NODE(naosoccer_pos_action::NaosoccerPosActionNode)
+
+

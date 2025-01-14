@@ -1,4 +1,5 @@
 // Copyright 2023 Kenji Brameld
+// Copyright 2024 Antonio Bono
 // Copyright 2025 Reilly Fox
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,7 +33,7 @@
 #include "naosoccer_pos_action_interfaces/action/action.hpp"
 
 
-namespace naosoccer_pos_action
+namespace naosoccer_pos_action_node
 {
 
 class NaosoccerPosActionNode : public rclcpp::Node
@@ -42,9 +43,25 @@ public:
   virtual ~NaosoccerPosActionNode();
 
 private:
+  void action_req_callback(const std_msgs::msg::String::SharedPtr msg);
+  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr action_req_sub_;
+  rclcpp::Publisher<std::string>::SharedPtr action_finished_pub_;
 
+// Client
+public:
+  using PosAction = naosoccer_pos_interfaces::action::PosAction;
+  using ClientGoalHandlePosAction = rclcpp_action::ClientGoalHandle<PosAction>;
+
+  rclcpp_action::Client<PosAction>::SharedPtr client_ptr_;
+
+  void send_goal(std::string& action_name);
+  void goal_response_callback(
+	  const ClientGoalHandlePosAction::SharedPtr& goal_handle);
+  void result_callback(const ClientGoalHandlePosAction::WrappedResult& result);
+  void feedback_callback(ClientGoalHandlePosAction::SharedPtr,
+						 const std::shared_ptr<const PosAction::Feedback> feedback);
 };
 
-}  // namespace naosoccer_pos_action
+}  // namespace naosoccer_pos_action_node
 
 #endif  // NAOSOCCER_POS_ACTION__NAOSOCCER_POS_ACTION_NODE_HPP_

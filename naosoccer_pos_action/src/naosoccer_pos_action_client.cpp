@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "naosoccer_pos_action/naosoccer_pos_action_client.hpp"
+#include "naosoccer_pos_action/naosoccer_pos_action_node.hpp"
 
 #include <functional>
 #include <future>
@@ -34,44 +34,15 @@
 
 namespace fs = boost::filesystem;
 
-namespace naosoccer_pos_action_client_ns
+namespace naosoccer_pos_action_node
 {
 
-NaosoccerPosActionClient::NaosoccerPosActionClient(const rclcpp::NodeOptions & options)
-: rclcpp::Node{"naosoccer_pos_action_client_node", options}
-{
-  using namespace std::placeholders;
-  this->client_ptr_ = rclcpp_action::create_client<PosAction>(this, "naosoccer_pos_action");
-
-  /*this->timer_ = this->create_wall_timer(
-                   std::chrono::milliseconds(500),
-                   std::bind(&NaosoccerPosActionClient::send_goal, this));
-  */
-
-  this->sub_action_req_ = this->create_subscription<std_msgs::msg::String>(
-    "action_req", 10, std::bind(&NaosoccerPosActionClient::action_req_callback, this, _1));
-
-  RCLCPP_INFO(this->get_logger(), "NaosoccerPosActionClient initialized");
-}
-
-NaosoccerPosActionClient::~NaosoccerPosActionClient() {}
-
-void NaosoccerPosActionClient::action_req_callback(const std_msgs::msg::String::SharedPtr msg)
-{
-  RCLCPP_DEBUG(this->get_logger(), "I heard: '%s'", msg->data.c_str());
-
-  std::string action_name = msg->data;
-  this->send_goal(action_name);
-}
-
-void NaosoccerPosActionClient::send_goal(std::string & action_name)
+void NaosoccerPosActionNode::send_goal(std::string & action_name)
 {
   using namespace std::placeholders;
 
-  // this->timer_->cancel();
-
-  if (!this->client_ptr_->wait_for_action_server()) {
-    RCLCPP_ERROR(this->get_logger(), "Action server not available after waiting");
+  if (!this->client_ptr_->wait_for_action_server(std::chrono::seconds(5))) {
+    RCLCPP_ERROR(node_->get_logger(), "Action server not available after waiting 5 seconds");
     rclcpp::shutdown();
   }
 
@@ -81,54 +52,52 @@ void NaosoccerPosActionClient::send_goal(std::string & action_name)
   auto send_goal_options = rclcpp_action::Client<PosAction>::SendGoalOptions();
 
   send_goal_options.goal_response_callback =
-    std::bind(&NaosoccerPosActionClient::goal_response_callback, this, _1);
+    std::bind(&NaosoccerPosActionNode::goal_response_callback, this, _1);
 
   // send_goal_options.feedback_callback =
-  //   std::bind(&NaosoccerPosActionClient::feedback_callback, this, _1, _2);
+  //   std::bind(&NaosoccerPosActionNode::feedback_callback, this, _1, _2);
 
-  send_goal_options.result_callback = std::bind(&NaosoccerPosActionClient::result_callback, this, _1);
+  send_goal_options.result_callback = std::bind(&NaosoccerPosActionNode::result_callback, this, _1);
 
   RCLCPP_INFO(
-    this->get_logger(), ("Sending goal request for pos file:  " + action_name + ".pos").c_str());
+    node_->get_logger(), ("Sending goal request for pos file:  " + action_name + ".pos").c_str());
 
   this->client_ptr_->async_send_goal(goal_msg, send_goal_options);
 }
 
-void NaosoccerPosActionClient::goal_response_callback(const ClientGoalHandlePosAction::SharedPtr & goal_handle)
+void NaosoccerPosActionNode::goal_response_callback(const ClientGoalHandlePosAction::SharedPtr & goal_handle)
 {
   if (!goal_handle) {
-    RCLCPP_ERROR(this->get_logger(), "Goal was rejected by server");
+    RCLCPP_ERROR(node_->get_logger(), "Goal was rejected by server");
   } else {
-    RCLCPP_INFO(this->get_logger(), "Goal accepted by server, waiting for result");
+    RCLCPP_INFO(node_->get_logger(), "Goal accepted by server, waiting for result");
   }
 }
 
 /*
-void NaosoccerPosActionClient::feedback_callback(ClientGoalHandlePosAction::SharedPtr,
+void NaosoccerPosActionNode::feedback_callback(ClientGoalHandlePosAction::SharedPtr,
                                            const std::shared_ptr<const PosAction::Feedback> feedback)
 {
   // TODO
 }
 */
 
-void NaosoccerPosActionClient::result_callback(const ClientGoalHandlePosAction::WrappedResult & result)
+void NaosoccerPosActionNode::result_callback(const ClientGoalHandlePosAction::WrappedResult & result)
 {
   switch (result.code) {
     case rclcpp_action::ResultCode::SUCCEEDED:
-      RCLCPP_INFO(this->get_logger(), "Joints posisitions regulary played.");
+      RCLCPP_INFO(node_->get_logger(), "Joints posisitions regulary played.");
       return;
     case rclcpp_action::ResultCode::ABORTED:
-      RCLCPP_ERROR(this->get_logger(), " nao pos Goal was aborted");
+      RCLCPP_ERROR(node_->get_logger(), " nao pos Goal was aborted");
       return;
     case rclcpp_action::ResultCode::CANCELED:
-      RCLCPP_ERROR(this->get_logger(), " nao pos Goal was canceled");
+      RCLCPP_ERROR(node_->get_logger(), " nao pos Goal was canceled");
       return;
     default:
-      RCLCPP_ERROR(this->get_logger(), " nao pos Unknown result code");
+      RCLCPP_ERROR(node_->get_logger(), " nao pos Unknown result code");
       return;
   }
 }
 
 }  // namespace naosoccer_pos_action_client_ns
-
-RCLCPP_COMPONENTS_REGISTER_NODE(naosoccer_pos_action_client_ns::NaosoccerPosActionClient)
