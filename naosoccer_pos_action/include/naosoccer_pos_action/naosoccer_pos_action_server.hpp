@@ -39,28 +39,31 @@ public:
   using PosAction = naosoccer_pos_action_interfaces::action::PosAction;
   using ServerGoalHandlePosAction = rclcpp_action::ServerGoalHandle<PosAction>;
 
-  explicit NaosoccerPosActionServer(const rclcpp::NodeOptions& options = rclcpp::NodeOptions{});
+  explicit NaosoccerPosActionServer(const rclcpp::NodeOptions & options = rclcpp::NodeOptions{});
   virtual ~NaosoccerPosActionServer();
 
 private:
-  bool canParsePosFolder(std::string& folder_path);
-  bool canParsePosFile(std::string& file_path);
-  void readPosFile(std::string& file_path);
-  std::string getFullFilePath(std::string& filename);
-  std::vector<std::string> readLines(std::ifstream& ifstream);
-  float findElem(const std::vector<uint8_t>& indexes, const std::vector<float>& data, uint8_t joint);
-  const KeyFrame& findPreviousKeyFrame(int time_ms);
-  const KeyFrame& findNextKeyFrame(int time_ms);
+  bool canParsePosFolder(std::string & folder_path);
+  bool canParsePosFile(std::string & file_path);
+  void readPosFile(std::string & file_path);
+  std::string getFullFilePath(std::string & filename);
+  std::vector<std::string> readLines(std::ifstream & ifstream);
+  float findElem(
+    const std::vector<uint8_t> & indexes, const std::vector<float> & data,
+    uint8_t joint);
+  const KeyFrame & findPreviousKeyFrame(int time_ms);
+  const KeyFrame & findNextKeyFrame(int time_ms);
   bool posFinished(int time_ms);
 
-  void calculateEffectorJoints(nao_lola_sensor_msgs::msg::JointPositions& sensor_joints);
+  void calculateEffectorJoints(nao_lola_sensor_msgs::msg::JointPositions & sensor_joints);
 
-  rclcpp_action::GoalResponse handle_goal(const rclcpp_action::GoalUUID& uuid,
-                                         std::shared_ptr<const PosAction::Goal> goal);
+  rclcpp_action::GoalResponse handle_goal(
+    const rclcpp_action::GoalUUID & uuid,
+    std::shared_ptr<const PosAction::Goal> goal);
   rclcpp_action::CancelResponse
   handle_cancel(const std::shared_ptr<ServerGoalHandlePosAction> goal_handle);
   void handle_accepted(
-      const std::shared_ptr<ServerGoalHandlePosAction> goal_handle);
+    const std::shared_ptr<ServerGoalHandlePosAction> goal_handle);
   void handlePosFinished();
   void execute(const std::shared_ptr<ServerGoalHandlePosAction> goal_handle);
 

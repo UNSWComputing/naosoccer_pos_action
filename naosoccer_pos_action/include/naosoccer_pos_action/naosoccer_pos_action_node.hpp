@@ -49,21 +49,23 @@ private:
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr pub_action_finished_;
 
 // Client
+
 public:
   using PosAction = naosoccer_pos_action_interfaces::action::PosAction;
   using ClientGoalHandlePosAction = rclcpp_action::ClientGoalHandle<PosAction>;
 
   rclcpp_action::Client<PosAction>::SharedPtr client_ptr_;
 
-  void send_goal(std::string& action_name);
+  void send_goal(std::string & action_name);
   void goal_response_callback(
-	  const ClientGoalHandlePosAction::SharedPtr& goal_handle);
-  void result_callback(const ClientGoalHandlePosAction::WrappedResult& result);
-  void feedback_callback(ClientGoalHandlePosAction::SharedPtr,
-						 const std::shared_ptr<const PosAction::Feedback> feedback);
+    const ClientGoalHandlePosAction::SharedPtr & goal_handle);
+  void result_callback(const ClientGoalHandlePosAction::WrappedResult & result);
+  void feedback_callback(
+    ClientGoalHandlePosAction::SharedPtr,
+    const std::shared_ptr<const PosAction::Feedback> feedback);
   void send_kick_cancel();
   void kick_cancel_response_callback(
-    const rclcpp_action::Client<PosAction>::CancelResponse::SharedPtr& response);
+    const rclcpp_action::Client<PosAction>::CancelResponse::SharedPtr & response);
 };
 
 }  // namespace naosoccer_pos_action_node

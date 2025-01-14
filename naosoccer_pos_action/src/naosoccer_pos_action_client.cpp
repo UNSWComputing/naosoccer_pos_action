@@ -64,7 +64,8 @@ void NaosoccerPosActionNode::send_goal(std::string & action_name)
   client_ptr_->async_send_goal(goal_msg, send_goal_options);
 }
 
-void NaosoccerPosActionNode::goal_response_callback(const ClientGoalHandlePosAction::SharedPtr & goal_handle)
+void NaosoccerPosActionNode::goal_response_callback(
+  const ClientGoalHandlePosAction::SharedPtr & goal_handle)
 {
   if (!goal_handle) {
     RCLCPP_ERROR(this->get_logger(), "Goal was rejected by server");
@@ -73,8 +74,9 @@ void NaosoccerPosActionNode::goal_response_callback(const ClientGoalHandlePosAct
   }
 }
 
-void NaosoccerPosActionNode::feedback_callback(ClientGoalHandlePosAction::SharedPtr,
-                                           const std::shared_ptr<const PosAction::Feedback> feedback)
+void NaosoccerPosActionNode::feedback_callback(
+  ClientGoalHandlePosAction::SharedPtr,
+  const std::shared_ptr<const PosAction::Feedback> feedback)
 {
   RCLCPP_INFO(this->get_logger(), "Feedback: progress = %d%%", feedback->progress);
   // For wrapper node
@@ -84,7 +86,8 @@ void NaosoccerPosActionNode::feedback_callback(ClientGoalHandlePosAction::Shared
   //
 }
 
-void NaosoccerPosActionNode::result_callback(const ClientGoalHandlePosAction::WrappedResult & result)
+void NaosoccerPosActionNode::result_callback(
+  const ClientGoalHandlePosAction::WrappedResult & result)
 {
   switch (result.code) {
     case rclcpp_action::ResultCode::SUCCEEDED:

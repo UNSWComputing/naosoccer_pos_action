@@ -55,7 +55,9 @@ NaosoccerPosActionServer::NaosoccerPosActionServer(const rclcpp::NodeOptions & o
 
   action_server_ = rclcpp_action::create_server<PosAction>(
     this, "naosoccer_pos_action",
-    std::bind(&NaosoccerPosActionServer::handle_goal, this, std::placeholders::_1, std::placeholders::_2),
+    std::bind(
+      &NaosoccerPosActionServer::handle_goal, this, std::placeholders::_1,
+      std::placeholders::_2),
     std::bind(&NaosoccerPosActionServer::handle_cancel, this, std::placeholders::_1),
     std::bind(&NaosoccerPosActionServer::handle_accepted, this, std::placeholders::_1));
 
@@ -80,24 +82,24 @@ NaosoccerPosActionServer::~NaosoccerPosActionServer() {}
 bool NaosoccerPosActionServer::canParsePosFolder(std::string & folder_path)
 {
   try {
-    for (const auto &entry : fs::recursive_directory_iterator(folder_path)) {
+    for (const auto & entry : fs::recursive_directory_iterator(folder_path)) {
       if (fs::is_regular_file(entry)) {
         std::string filePath = entry.path().string();
         bool isValid = canParsePosFile(filePath);
         if (isValid) {
-            RCLCPP_DEBUG(this->get_logger(), ("Valid pos file: " + filePath).c_str());
+          RCLCPP_DEBUG(this->get_logger(), ("Valid pos file: " + filePath).c_str());
         } else {
-            RCLCPP_WARN(this->get_logger(), ("Invalid pos file: " + filePath).c_str());
-            return false;
+          RCLCPP_WARN(this->get_logger(), ("Invalid pos file: " + filePath).c_str());
+          return false;
         }
       }
     }
-  } catch (const fs::filesystem_error &e) {
-      RCLCPP_ERROR(this->get_logger(), "Filesystem error %s", e.what());
-      return false;
-  } catch (const std::exception &e) {
-      RCLCPP_ERROR(this->get_logger(), "Error: %s", e.what());
-      return false;
+  } catch (const fs::filesystem_error & e) {
+    RCLCPP_ERROR(this->get_logger(), "Filesystem error %s", e.what());
+    return false;
+  } catch (const std::exception & e) {
+    RCLCPP_ERROR(this->get_logger(), "Error: %s", e.what());
+    return false;
   }
   return true;
 }
@@ -270,7 +272,8 @@ void NaosoccerPosActionServer::calculateEffectorJoints(
   pub_joint_stiffnesses_->publish(nextKeyFrame.stiffnesses);
 }
 
-void NaosoccerPosActionServer::handlePosFinished() {
+void NaosoccerPosActionServer::handlePosFinished()
+{
   pos_in_action_ = false;
   RCLCPP_DEBUG(this->get_logger(), "Pos finished");
 
@@ -312,7 +315,7 @@ rclcpp_action::GoalResponse NaosoccerPosActionServer::handle_goal(
 
 rclcpp_action::CancelResponse NaosoccerPosActionServer::handle_cancel(
   const std::shared_ptr<ServerGoalHandlePosAction>
-    goal_handle)
+  goal_handle)
 {
   std::lock_guard<std::mutex> lock(mutex_);
   RCLCPP_INFO(get_logger(), "Received request to cancel goal");
@@ -321,7 +324,8 @@ rclcpp_action::CancelResponse NaosoccerPosActionServer::handle_cancel(
   return rclcpp_action::CancelResponse::ACCEPT;
 }
 
-void NaosoccerPosActionServer::handle_accepted(const std::shared_ptr<ServerGoalHandlePosAction> goal_handle)
+void NaosoccerPosActionServer::handle_accepted(
+  const std::shared_ptr<ServerGoalHandlePosAction> goal_handle)
 {
   std::thread([this, goal_handle]() {execute(goal_handle);}).detach();
 }
@@ -338,11 +342,11 @@ void NaosoccerPosActionServer::execute(const std::shared_ptr<ServerGoalHandlePos
   auto result = std::make_shared<PosAction::Result>();
 
   auto pos_finished_callback = [this, goal_handle, result]() {
-    result->success = true;
-    result->message = "Pos action completed successfully";
-    goal_handle->succeed(result);
-    RCLCPP_INFO(this->get_logger(), "Goal succeeded");
-  };
+      result->success = true;
+      result->message = "Pos action completed successfully";
+      goal_handle->succeed(result);
+      RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+    };
 
   setPosFinishedCallback(pos_finished_callback);
 
@@ -358,7 +362,7 @@ void NaosoccerPosActionServer::execute(const std::shared_ptr<ServerGoalHandlePos
 
     int time_ms = (rclcpp::Node::now() - initial_time_).nanoseconds() / 1e6;
     const auto pos_time = key_frames_.back().t_ms;
-    feedback->progress = time_ms/pos_time;
+    feedback->progress = time_ms / pos_time;
     goal_handle->publish_feedback(feedback);
     RCLCPP_INFO(this->get_logger(), "Feedback: progress = %d%%", feedback->progress);
 
