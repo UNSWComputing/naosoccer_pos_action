@@ -30,7 +30,7 @@
 
 namespace fs = boost::filesystem;
 
-namespace naosoccer_pos_action_server_ns
+namespace naosoccer_pos_action_server
 {
 
 NaosoccerPosActionServer::NaosoccerPosActionServer(const rclcpp::NodeOptions & options)

@@ -33,7 +33,7 @@
 #include "naosoccer_pos_interfaces/action/pos_action.hpp"
 #include "naosoccer_pos_action/key_frame.hpp"
 
-namespace naosoccer_pos_action_server_ns
+namespace naosoccer_pos_action_server
 {
 
 class NaosoccerPosActionServer : public rclcpp::Node
