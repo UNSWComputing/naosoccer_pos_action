@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef NAO_POS_SERVER__NAO_POS_ACTION_CLIENT_HPP_
-#define NAO_POS_SERVER__NAO_POS_ACTION_CLIENT_HPP_
+#ifndef NAOSOCCER_POS_SERVER__NAOSOCCER_POS_ACTION_CLIENT_HPP_
+#define NAOSOCCER_POS_SERVER__NAOSOCCER_POS_ACTION_CLIENT_HPP_
 
 #include <functional>
 #include <future>
@@ -32,36 +32,36 @@
 #include "nao_lola_command_msgs/msg/joint_indexes.hpp"
 #include "nao_lola_command_msgs/msg/joint_stiffnesses.hpp"
 
-#include "nao_pos_interfaces/action/pos_play.hpp"
+#include "naosoccer_pos_interfaces/action/pos_play.hpp"
 #include "std_msgs/msg/string.hpp"
 
 namespace fs = boost::filesystem;
 
-namespace nao_pos_action_client_ns
+namespace naosoccer_pos_action_client_ns
 {
 
-class NaoPosActionClient : public rclcpp::Node
+class NaosoccerPosActionClient : public rclcpp::Node
 {
 public:
-  explicit NaoPosActionClient(const rclcpp::NodeOptions& options = rclcpp::NodeOptions{});
-  virtual ~NaoPosActionClient();
+  explicit NaosoccerPosActionClient(const rclcpp::NodeOptions& options = rclcpp::NodeOptions{});
+  virtual ~NaosoccerPosActionClient();
 
 private:
   void send_goal(std::string& action_name);
   void action_req_callback(const std_msgs::msg::String::SharedPtr msg);
   void goal_response_callback(
-	  const rclcpp_action::ClientGoalHandle<nao_pos_interfaces::action::PosPlay>::SharedPtr& goal_handle);
-  void feedback_callback(rclcpp_action::ClientGoalHandle<nao_pos_interfaces::action::PosPlay>::SharedPtr,
-						 const std::shared_ptr<const nao_pos_interfaces::action::PosPlay::Feedback> feedback);
+	  const rclcpp_action::ClientGoalHandle<naosoccer_pos_interfaces::action::PosPlay>::SharedPtr& goal_handle);
+  void feedback_callback(rclcpp_action::ClientGoalHandle<naosoccer_pos_interfaces::action::PosPlay>::SharedPtr,
+						 const std::shared_ptr<const naosoccer_pos_interfaces::action::PosPlay::Feedback> feedback);
   void
-  result_callback(const rclcpp_action::ClientGoalHandle<nao_pos_interfaces::action::PosPlay>::WrappedResult& result);
+  result_callback(const rclcpp_action::ClientGoalHandle<naosoccer_pos_interfaces::action::PosPlay>::WrappedResult& result);
 
-  rclcpp_action::Client<nao_pos_interfaces::action::PosPlay>::SharedPtr client_ptr_;
+  rclcpp_action::Client<naosoccer_pos_interfaces::action::PosPlay>::SharedPtr client_ptr_;
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Subscription<std_msgs::msg::String>::SharedPtr sub_action_req_;
 
-};	// NaoPosActionClient
+};	// NaosoccerPosActionClient
 
-}  // namespace nao_pos_action_client_ns
+}  // namespace naosoccer_pos_action_client_ns
 
-#endif	// NAO_POS_SERVER__NAO_POS_ACTION_CLIENT_HPP_
+#endif	// NAOSOCCER_POS_SERVER__NAOSOCCER_POS_ACTION_CLIENT_HPP_

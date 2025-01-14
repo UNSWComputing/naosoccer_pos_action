@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef NAO_POS_SERVER__NAO_POS_ACTION_SERVER_HPP_
-#define NAO_POS_SERVER__NAO_POS_ACTION_SERVER_HPP_
+#ifndef NAOSOCCER_POS_SERVER__NAOSOCCER_POS_ACTION_SERVER_HPP_
+#define NAOSOCCER_POS_SERVER__NAOSOCCER_POS_ACTION_SERVER_HPP_
 
 #include <memory>
 #include <string>
@@ -29,17 +29,17 @@
 #include "nao_lola_command_msgs/msg/joint_indexes.hpp"
 #include "nao_lola_sensor_msgs/msg/joint_positions.hpp"
 
-#include "nao_pos_interfaces/action/pos_play.hpp"
-#include "nao_pos_server/key_frame.hpp"
+#include "naosoccer_pos_interfaces/action/pos_play.hpp"
+#include "naosoccer_pos_action/key_frame.hpp"
 
-namespace nao_pos_action_server_ns
+namespace naosoccer_pos_action_server_ns
 {
 
-class NaoPosActionServer : public rclcpp::Node
+class NaosoccerPosActionServer : public rclcpp::Node
 {
 public:
-  explicit NaoPosActionServer(const rclcpp::NodeOptions& options = rclcpp::NodeOptions{});
-  virtual ~NaoPosActionServer();
+  explicit NaosoccerPosActionServer(const rclcpp::NodeOptions& options = rclcpp::NodeOptions{});
+  virtual ~NaosoccerPosActionServer();
 
 private:
   std::string getFullFilePath(std::string& filename);
@@ -52,17 +52,17 @@ private:
   float findElem(const std::vector<uint8_t>& indexes, const std::vector<float>& data, uint8_t joint);
 
   rclcpp_action::GoalResponse handleGoal(const rclcpp_action::GoalUUID& uuid,
-                                         std::shared_ptr<const nao_pos_interfaces::action::PosPlay::Goal> goal);
+                                         std::shared_ptr<const naosoccer_pos_interfaces::action::PosPlay::Goal> goal);
   rclcpp_action::CancelResponse
-  handleCancel(const std::shared_ptr<rclcpp_action::ServerGoalHandle<nao_pos_interfaces::action::PosPlay>> goal_handle);
+  handleCancel(const std::shared_ptr<rclcpp_action::ServerGoalHandle<naosoccer_pos_interfaces::action::PosPlay>> goal_handle);
   void handleAccepted(
-      const std::shared_ptr<rclcpp_action::ServerGoalHandle<nao_pos_interfaces::action::PosPlay>> goal_handle);
+      const std::shared_ptr<rclcpp_action::ServerGoalHandle<naosoccer_pos_interfaces::action::PosPlay>> goal_handle);
 
   rclcpp::Subscription<nao_lola_sensor_msgs::msg::JointPositions>::SharedPtr sub_joint_states_;
   rclcpp::Publisher<nao_lola_command_msgs::msg::JointPositions>::SharedPtr pub_joint_positions_;
   rclcpp::Publisher<nao_lola_command_msgs::msg::JointStiffnesses>::SharedPtr pub_joint_stiffnesses_;
 
-  rclcpp_action::Server<nao_pos_interfaces::action::PosPlay>::SharedPtr action_server_;
+  rclcpp_action::Server<naosoccer_pos_interfaces::action::PosPlay>::SharedPtr action_server_;
 
   bool file_successfully_read_ = false;
   std::vector<KeyFrame> key_frames_;
@@ -72,11 +72,11 @@ private:
   rclcpp::Time initial_time_;
   std::vector<uint8_t> selected_joints_;
 
-  std::shared_ptr<rclcpp_action::ServerGoalHandle<nao_pos_interfaces::action::PosPlay>> goal_handle_;
+  std::shared_ptr<rclcpp_action::ServerGoalHandle<naosoccer_pos_interfaces::action::PosPlay>> goal_handle_;
 
   std::mutex mutex_;
 };
 
-}  // namespace nao_pos_action_server_ns
+}  // namespace naosoccer_pos_action_server_ns
 
-#endif  // NAO_POS_SERVER__NAO_POS_SERVER_HPP_
+#endif  // NAOSOCCER_POS_SERVER__NAOSOCCER_POS_SERVER_HPP_

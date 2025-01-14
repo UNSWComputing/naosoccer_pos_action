@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "nao_pos_server/nao_pos_action_server.hpp"
+#include "naosoccer_pos_action/naosoccer_pos_action_server.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -29,11 +29,11 @@
 
 namespace fs = boost::filesystem;
 
-namespace nao_pos_action_server_ns
+namespace naosoccer_pos_action_server_ns
 {
 
-NaoPosActionServer::NaoPosActionServer(const rclcpp::NodeOptions & options)
-: rclcpp::Node{"nao_pos_action_server_node", options}, pos_in_action_(false)
+NaosoccerPosActionServer::NaosoccerPosActionServer(const rclcpp::NodeOptions & options)
+: rclcpp::Node{"naosoccer_pos_action_server_node", options}, pos_in_action_(false)
 {
   pub_joint_positions_ = create_publisher<nao_lola_command_msgs::msg::JointPositions>(
     "/effectors/joint_positions", rclcpp::SensorDataQoS());
@@ -48,18 +48,18 @@ NaoPosActionServer::NaoPosActionServer(const rclcpp::NodeOptions & options)
       }
     });
 
-  action_server_ = rclcpp_action::create_server<nao_pos_interfaces::action::PosPlay>(
-    this, "nao_pos_action",
-    std::bind(&NaoPosActionServer::handleGoal, this, std::placeholders::_1, std::placeholders::_2),
-    std::bind(&NaoPosActionServer::handleCancel, this, std::placeholders::_1),
-    std::bind(&NaoPosActionServer::handleAccepted, this, std::placeholders::_1));
+  action_server_ = rclcpp_action::create_server<naosoccer_pos_interfaces::action::PosPlay>(
+    this, "naosoccer_pos_action",
+    std::bind(&NaosoccerPosActionServer::handleGoal, this, std::placeholders::_1, std::placeholders::_2),
+    std::bind(&NaosoccerPosActionServer::handleCancel, this, std::placeholders::_1),
+    std::bind(&NaosoccerPosActionServer::handleAccepted, this, std::placeholders::_1));
 
-  RCLCPP_INFO(this->get_logger(), "nao_pos_action_server_node initialized");
+  RCLCPP_INFO(this->get_logger(), "naosoccer_pos_action_server_node initialized");
 }
 
-NaoPosActionServer::~NaoPosActionServer() {}
+NaosoccerPosActionServer::~NaosoccerPosActionServer() {}
 
-void NaoPosActionServer::readPosFile(std::string & filePath)
+void NaosoccerPosActionServer::readPosFile(std::string & filePath)
 {
   std::ifstream ifstream(filePath);
   if (ifstream.is_open()) {
@@ -75,11 +75,11 @@ void NaoPosActionServer::readPosFile(std::string & filePath)
   }
 }
 
-std::string NaoPosActionServer::getFullFilePath(std::string & filename)
+std::string NaosoccerPosActionServer::getFullFilePath(std::string & filename)
 {
   std::string file = "pos/" + filename;
   std::string package_share_directory =
-    ament_index_cpp::get_package_share_directory("nao_pos_server");
+    ament_index_cpp::get_package_share_directory("naosoccer_pos_action");
 
   fs::path dir_path(package_share_directory);
   fs::path file_path(file);
@@ -87,7 +87,7 @@ std::string NaoPosActionServer::getFullFilePath(std::string & filename)
   return full_path.string();
 }
 
-std::vector<std::string> NaoPosActionServer::readLines(std::ifstream & ifstream)
+std::vector<std::string> NaosoccerPosActionServer::readLines(std::ifstream & ifstream)
 {
   std::vector<std::string> ret;
 
@@ -100,7 +100,7 @@ std::vector<std::string> NaoPosActionServer::readLines(std::ifstream & ifstream)
   return ret;
 }
 
-float NaoPosActionServer::findElem(
+float NaosoccerPosActionServer::findElem(
   const std::vector<uint8_t> & indexes, const std::vector<float> & data, uint8_t joint)
 {
   for (uint8_t a = 0; a < indexes.size(); a++) {
@@ -111,13 +111,13 @@ float NaoPosActionServer::findElem(
   return NAN;
 }
 
-void NaoPosActionServer::calculateEffectorJoints(
+void NaosoccerPosActionServer::calculateEffectorJoints(
   nao_lola_sensor_msgs::msg::JointPositions & sensor_joints)
 {
   //std::lock_guard<std::mutex> lock(mutex_);
 
   if (goal_handle_->is_canceling()) {
-    auto result = std::make_shared<nao_pos_interfaces::action::PosPlay::Result>();
+    auto result = std::make_shared<naosoccer_pos_interfaces::action::PosPlay::Result>();
     result->success = false;
     goal_handle_->canceled(result);
     RCLCPP_DEBUG(this->get_logger(), "pos action goal canceled");
@@ -129,7 +129,7 @@ void NaoPosActionServer::calculateEffectorJoints(
   if (posFinished(time_ms)) {
     // We've finished the motion, set to DONE
     pos_in_action_ = false;
-    auto result = std::make_shared<nao_pos_interfaces::action::PosPlay::Result>();
+    auto result = std::make_shared<naosoccer_pos_interfaces::action::PosPlay::Result>();
     result->success = true;
     goal_handle_->succeed(result);
     RCLCPP_DEBUG(this->get_logger(), "Pos finished");
@@ -217,7 +217,7 @@ void NaoPosActionServer::calculateEffectorJoints(
     this->get_logger(), "published to /effectors/joint_positions and /effectors/joint_stiffnesses");
 }
 
-const KeyFrame & NaoPosActionServer::findPreviousKeyFrame(int time_ms)
+const KeyFrame & NaosoccerPosActionServer::findPreviousKeyFrame(int time_ms)
 {
   for (auto it = key_frames_.rbegin(); it != key_frames_.rend(); ++it) {
     const auto & keyFrame = *it;
@@ -230,7 +230,7 @@ const KeyFrame & NaoPosActionServer::findPreviousKeyFrame(int time_ms)
   return *key_frame_start_;
 }
 
-const KeyFrame & NaoPosActionServer::findNextKeyFrame(int time_ms)
+const KeyFrame & NaosoccerPosActionServer::findNextKeyFrame(int time_ms)
 {
   for (const auto & keyFrame : key_frames_) {
     int keyFrameDeadline = keyFrame.t_ms;
@@ -243,7 +243,7 @@ const KeyFrame & NaoPosActionServer::findNextKeyFrame(int time_ms)
   return key_frames_.back();
 }
 
-bool NaoPosActionServer::posFinished(int time_ms)
+bool NaosoccerPosActionServer::posFinished(int time_ms)
 {
   if (key_frames_.size() == 0) {
     return true;
@@ -258,9 +258,9 @@ bool NaoPosActionServer::posFinished(int time_ms)
   return false;
 }
 
-rclcpp_action::GoalResponse NaoPosActionServer::handleGoal(
+rclcpp_action::GoalResponse NaosoccerPosActionServer::handleGoal(
   const rclcpp_action::GoalUUID & uuid,
-  std::shared_ptr<const nao_pos_interfaces::action::PosPlay::Goal> goal)
+  std::shared_ptr<const naosoccer_pos_interfaces::action::PosPlay::Goal> goal)
 {
   std::lock_guard<std::mutex> lock(mutex_);
 
@@ -281,8 +281,8 @@ rclcpp_action::GoalResponse NaoPosActionServer::handleGoal(
   return rclcpp_action::GoalResponse::REJECT;
 }
 
-rclcpp_action::CancelResponse NaoPosActionServer::handleCancel(
-  const std::shared_ptr<rclcpp_action::ServerGoalHandle<nao_pos_interfaces::action::PosPlay>>
+rclcpp_action::CancelResponse NaosoccerPosActionServer::handleCancel(
+  const std::shared_ptr<rclcpp_action::ServerGoalHandle<naosoccer_pos_interfaces::action::PosPlay>>
     goal_handle)
 {
   std::lock_guard<std::mutex> lock(mutex_);
@@ -293,8 +293,8 @@ rclcpp_action::CancelResponse NaoPosActionServer::handleCancel(
   return rclcpp_action::CancelResponse::ACCEPT;
 }
 
-void NaoPosActionServer::handleAccepted(
-  const std::shared_ptr<rclcpp_action::ServerGoalHandle<nao_pos_interfaces::action::PosPlay>>
+void NaosoccerPosActionServer::handleAccepted(
+  const std::shared_ptr<rclcpp_action::ServerGoalHandle<naosoccer_pos_interfaces::action::PosPlay>>
     goal_handle)
 {
   std::lock_guard<std::mutex> lock(mutex_);
@@ -306,7 +306,7 @@ void NaoPosActionServer::handleAccepted(
   goal_handle_ = goal_handle;
 }
 
-}  // namespace nao_pos_action_server_ns
+}  // namespace naosoccer_pos_action_server_ns
 
 #include "rclcpp_components/register_node_macro.hpp"
-RCLCPP_COMPONENTS_REGISTER_NODE(nao_pos_action_server_ns::NaoPosActionServer)
+RCLCPP_COMPONENTS_REGISTER_NODE(naosoccer_pos_action_server_ns::NaosoccerPosActionServer)
