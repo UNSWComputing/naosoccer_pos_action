@@ -233,85 +233,53 @@ void NaosoccerPosActionServer::calculateEffectorJoints(
     return;
   }
 
-  if (firstTickSinceActionStarted_) {
+  if (firstTickSinceActionStarted) {
     nao_lola_command_msgs::msg::JointPositions command;
     command.indexes = indexes::indexes;
-    command.positions =
-      std::vector<float>(sensor_joints.positions.begin(), sensor_joints.positions.end());
-    key_frame_start_ =
+    command.positions = std::vector<float>(
+      sensor_joints.positions.begin(), sensor_joints.positions.end());
+    keyFrameStart =
       std::make_unique<KeyFrame>(0, command, nao_lola_command_msgs::msg::JointStiffnesses{});
+    firstTickSinceActionStarted = false;
   }
+
+  RCLCPP_DEBUG(this->get_logger(), ("time_ms is: " + std::to_string(time_ms)).c_str());
 
   const auto & previousKeyFrame = findPreviousKeyFrame(time_ms);
   const auto & nextKeyFrame = findNextKeyFrame(time_ms);
-
-  if (firstTickSinceActionStarted_) {
-    for (auto i : nextKeyFrame.positions.indexes) {
-      selected_joints_.push_back(i);
-    }
-    firstTickSinceActionStarted_ = false;
-
-    RCLCPP_DEBUG(this->get_logger(), "first tick false");
-    /*std::string s1="";
-    for (unsigned c = 0; c < selected_joints_.size(); c++) {
-        s1.append( std::to_string(selected_joints_.at(c))+", " );
-    }
-    RCLCPP_INFO(this->get_logger(), ("selected_joints_: "+s1).c_str() );*/
-  }
 
   float timeFromPreviousKeyFrame = time_ms - previousKeyFrame.t_ms;
   float timeToNextKeyFrame = nextKeyFrame.t_ms - time_ms;
   float duration = timeFromPreviousKeyFrame + timeToNextKeyFrame;
 
   RCLCPP_DEBUG(
-    this->get_logger(), ("timeFromPreviousKeyFrame, timeToNextKeyFrame, duration: " +
-                         std::to_string(timeFromPreviousKeyFrame) + ", " +
-                         std::to_string(timeToNextKeyFrame) + ", " + std::to_string(duration))
-                          .c_str());
+    this->get_logger(), ("timeFromPreviousKeyFrame, timeFromPreviousKeyFrame, duration: " +
+    std::to_string(timeFromPreviousKeyFrame) + ", " + std::to_string(timeToNextKeyFrame) + ", " +
+    std::to_string(duration)).c_str());
 
-  float alpha = timeToNextKeyFrame / duration;  // normalized coefficent k of convex combination
-  float beta = timeFromPreviousKeyFrame / duration;  // normalized 1-k
+  float alpha = timeToNextKeyFrame / duration;
+  float beta = timeFromPreviousKeyFrame / duration;
 
   RCLCPP_DEBUG(
-    this->get_logger(),
-    ("alpha, beta: " + std::to_string(alpha) + ", " + std::to_string(beta)).c_str());
+    this->get_logger(), ("alpha, beta: " + std::to_string(alpha) + ", " + std::to_string(
+      beta)).c_str());
 
   nao_lola_command_msgs::msg::JointPositions effector_joints;
-  nao_lola_command_msgs::msg::JointStiffnesses effector_joints_stiff;
+  effector_joints.indexes = indexes::indexes;
 
-  float nextPos = NAN, previousPos = NAN, nextStiff = NAN;
-  float tmp = NAN;
+  for (unsigned int i = 0; i < nao_lola_command_msgs::msg::JointIndexes::NUMJOINTS; ++i) {
+    float previous = previousKeyFrame.positions.positions.at(i);
+    float next = nextKeyFrame.positions.positions.at(i);
+    effector_joints.positions.push_back(previous * alpha + next * beta);
 
-  for (uint8_t i : selected_joints_) {
-    nextPos = this->findElem(nextKeyFrame.positions.indexes, nextKeyFrame.positions.positions, i);
-    nextStiff =
-      this->findElem(nextKeyFrame.stiffnesses.indexes, nextKeyFrame.stiffnesses.stiffnesses, i);
-    previousPos =
-      this->findElem(previousKeyFrame.positions.indexes, previousKeyFrame.positions.positions, i);
-
-    tmp = previousPos * alpha + nextPos * beta;
-    if (tmp != NAN) {
-      effector_joints.indexes.push_back(i);
-      effector_joints.positions.push_back(tmp);
-    } else {
-      RCLCPP_ERROR(this->get_logger(), "NAN position");
-      return;
-    }
-    if (nextStiff != NAN) {
-      effector_joints_stiff.indexes.push_back(i);
-      effector_joints_stiff.stiffnesses.push_back(nextStiff);
-    } else {
-      RCLCPP_ERROR(this->get_logger(), "NAN stiffness");
-      return;
-    }
-
-    nextPos = NAN, previousPos = NAN, nextStiff = NAN;
+    RCLCPP_DEBUG(
+      this->get_logger(), ("previous, next, result: " + std::to_string(
+        previous) + ", " + std::to_string(next) + ", " +
+      std::to_string(effector_joints.positions.at(i))).c_str());
   }
 
-  pub_joint_positions_->publish(effector_joints);
-  pub_joint_stiffnesses_->publish(effector_joints_stiff);
-  RCLCPP_DEBUG(
-    this->get_logger(), "published to /effectors/joint_positions and /effectors/joint_stiffnesses");
+  pub_joint_positions->publish(effector_joints);
+  pub_joint_stiffnesses->publish(nextKeyFrame.stiffnesses);
 }
 
 rclcpp_action::GoalResponse NaosoccerPosActionServer::handleGoal(
