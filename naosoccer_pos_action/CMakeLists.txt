@@ -53,7 +53,7 @@ rclcpp_components_register_node(naosoccer_pos_action_node
 
 ament_target_dependencies(naosoccer_pos_action_node ${THIS_PACKAGE_INCLUDE_DEPENDS})
 
-ament_export_targets(export_naosoccer_pos_action HAS_LIBRARY_TARGET)
+ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
 ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
 
 # Build Server
@@ -70,7 +70,7 @@ rclcpp_components_register_node(naosoccer_pos_action_server
 
 ament_target_dependencies(naosoccer_pos_action_server ${THIS_PACKAGE_INCLUDE_DEPENDS})
 
-ament_export_targets(export_naosoccer_pos_action_server HAS_LIBRARY_TARGET)
+ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
 ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
 
 # Install
