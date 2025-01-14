@@ -42,38 +42,7 @@ public:
   virtual ~NaosoccerPosActionNode();
 
 private:
-  std::string getDefaultFullFilePath();
-  std::vector<std::string> readLines(std::ifstream & ifstream);
-  void calculateEffectorJoints(nao_lola_sensor_msgs::msg::JointPositions & sensor_joints);
-  const KeyFrame & findPreviousKeyFrame(int time_ms);
-  const KeyFrame & findNextKeyFrame(int time_ms);
-  bool posFinished(int time_ms);
 
-  rclcpp_action::GoalResponse handleGoal(
-    const rclcpp_action::GoalUUID & uuid,
-    std::shared_ptr<const naosoccer_pos_action_interfaces::action::Action::Goal> goal);
-  rclcpp_action::CancelResponse handleCancel(
-    const std::shared_ptr<rclcpp_action::ServerGoalHandle<naosoccer_pos_action_interfaces::action::Action>> goal_handle);
-  void handleAccepted(
-    const std::shared_ptr<rclcpp_action::ServerGoalHandle<naosoccer_pos_action_interfaces::action::Action>> goal_handle);
-
-  rclcpp::Subscription<nao_lola_sensor_msgs::msg::JointPositions>::SharedPtr sub_joint_states;
-  rclcpp::Publisher<nao_lola_command_msgs::msg::JointPositions>::SharedPtr pub_joint_positions;
-  rclcpp::Publisher<nao_lola_command_msgs::msg::JointStiffnesses>::SharedPtr pub_joint_stiffnesses;
-
-  rclcpp_action::Server<naosoccer_pos_action_interfaces::action::Action>::SharedPtr action_server_;
-
-  bool fileSuccessfullyRead = false;
-  std::vector<KeyFrame> keyFrames;
-  bool posInAction = false;
-  bool firstTickSinceActionStarted = true;
-  std::unique_ptr<KeyFrame> keyFrameStart;
-  rclcpp::Time begin;
-
-  std::shared_ptr<rclcpp_action::ServerGoalHandle<
-      naosoccer_pos_action_interfaces::action::Action>> goal_handle_;
-
-  std::mutex mutex;
 };
 
 }  // namespace naosoccer_pos_action
