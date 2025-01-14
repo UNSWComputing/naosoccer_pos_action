@@ -40,7 +40,7 @@ void NaosoccerPosActionNode::send_goal(std::string & action_name)
 {
   using namespace std::placeholders;
 
-  if (!this->client_ptr_->wait_for_action_server(std::chrono::seconds(5))) {
+  if (!client_ptr_->wait_for_action_server(std::chrono::seconds(5))) {
     RCLCPP_ERROR(this->get_logger(), "Action server not available after waiting 5 seconds");
     rclcpp::shutdown();
   }
@@ -61,7 +61,7 @@ void NaosoccerPosActionNode::send_goal(std::string & action_name)
   RCLCPP_INFO(
     this->get_logger(), ("Sending goal request for pos file:  " + action_name + ".pos").c_str());
 
-  this->client_ptr_->async_send_goal(goal_msg, send_goal_options);
+  client_ptr_->async_send_goal(goal_msg, send_goal_options);
 }
 
 void NaosoccerPosActionNode::goal_response_callback(const ClientGoalHandlePosAction::SharedPtr & goal_handle)
@@ -96,6 +96,31 @@ void NaosoccerPosActionNode::result_callback(const ClientGoalHandlePosAction::Wr
     default:
       RCLCPP_ERROR(this->get_logger(), " nao pos Unknown result code");
       return;
+  }
+}
+
+void NaosoccerPosActionNode::send_kick_cancel()
+{
+  if (!client_ptr_->wait_for_action_server(std::chrono::seconds(5))) {
+    RCLCPP_ERROR(this->get_logger(), "Action server not available after waiting");
+    return;
+  }
+
+  RCLCPP_INFO(this->get_logger(), "Sending cancel request for kick...");
+
+  // Cancel the ongoing goal
+  client_ptr_->async_cancel_all_goals(
+    std::bind(&NaosoccerPosActionNode::kick_cancel_response_callback, this, std::placeholders::_1)
+  );
+}
+
+void NaosoccerPosActionNode::kick_cancel_response_callback(
+  const rclcpp_action::Client<PosAction>::CancelResponse::SharedPtr & response)
+{
+  if (response->return_code == rclcpp_action::Client<PosAction>::CancelResponse::ERROR_NONE) {
+    RCLCPP_INFO(this->get_logger(), "Cancel request accepted by server");
+  } else {
+    RCLCPP_ERROR(this->get_logger(), "Cancel request was rejected by server");
   }
 }
 

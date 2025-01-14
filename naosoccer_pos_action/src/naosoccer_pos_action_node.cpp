@@ -36,15 +36,15 @@ namespace naosoccer_pos_action_node
 NaosoccerPosActionNode::NaosoccerPosActionNode(const rclcpp::NodeOptions & options)
 : rclcpp::Node{"NaosoccerPosActionNode", options}
 {
-  this->action_req_sub_ = this->create_subscription<std_msgs::msg::String>(
+  action_req_sub_ = this->create_subscription<std_msgs::msg::String>(
     "action_req", 1, std::bind(&NaosoccerPosActionNode::action_req_callback, this, std::placeholders::_1));
 
-  this->action_finished_pub_ = this->create_publisher<std_msgs::msg::String>("action_finished", 10);
+  action_finished_pub_ = this->create_publisher<std_msgs::msg::String>("action_finished", 10);
 
   RCLCPP_INFO(this->get_logger(), "NaosoccerPosActionNode initialized");
 
   // Client
-  this->client_ptr_ = rclcpp_action::create_client<PosAction>(this, "naosoccer_pos_action");
+  client_ptr_ = rclcpp_action::create_client<PosAction>(this, "naosoccer_pos_action");
 
 }
 

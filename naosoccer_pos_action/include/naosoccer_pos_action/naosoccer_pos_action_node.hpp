@@ -60,6 +60,9 @@ public:
   void result_callback(const ClientGoalHandlePosAction::WrappedResult& result);
   void feedback_callback(ClientGoalHandlePosAction::SharedPtr,
 						 const std::shared_ptr<const PosAction::Feedback> feedback);
+  void send_kick_cancel();
+  void kick_cancel_response_callback(
+    const rclcpp_action::Client<PosAction>::CancelResponse::SharedPtr& response);
 };
 
 }  // namespace naosoccer_pos_action_node
