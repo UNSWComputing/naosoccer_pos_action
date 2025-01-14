@@ -25,7 +25,7 @@
 #include "nao_lola_command_msgs/msg/joint_indexes.hpp"
 #include "nao_lola_command_msgs/msg/joint_positions.hpp"
 #include "nao_lola_command_msgs/msg/joint_stiffnesses.hpp"
-#include "naosoccer_pos_interfaces/action/pos_play.hpp"
+#include "naosoccer_pos_interfaces/action/pos_action.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "rclcpp_components/register_node_macro.hpp"
@@ -35,9 +35,6 @@ namespace fs = boost::filesystem;
 
 namespace naosoccer_pos_action_client_ns
 {
-
-using PosAction = naosoccer_pos_interfaces::action::PosPlay;
-using GoalHandlePosAction = rclcpp_action::ClientGoalHandle<PosAction>;
 
 NaosoccerPosActionClient::NaosoccerPosActionClient(const rclcpp::NodeOptions & options)
 : rclcpp::Node{"naosoccer_pos_action_client_node", options}

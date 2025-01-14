@@ -32,7 +32,7 @@
 #include "nao_lola_command_msgs/msg/joint_indexes.hpp"
 #include "nao_lola_command_msgs/msg/joint_stiffnesses.hpp"
 
-#include "naosoccer_pos_interfaces/action/pos_play.hpp"
+#include "naosoccer_pos_interfaces/action/pos_action.hpp"
 #include "std_msgs/msg/string.hpp"
 
 namespace fs = boost::filesystem;
@@ -43,6 +43,9 @@ namespace naosoccer_pos_action_client_ns
 class NaosoccerPosActionClient : public rclcpp::Node
 {
 public:
+  using PosAction = naosoccer_pos_interfaces::action::PosAction;
+  using GoalHandlePosAction = rclcpp_action::ClientGoalHandle<PosAction>;
+
   explicit NaosoccerPosActionClient(const rclcpp::NodeOptions& options = rclcpp::NodeOptions{});
   virtual ~NaosoccerPosActionClient();
 
@@ -50,13 +53,13 @@ private:
   void send_goal(std::string& action_name);
   void action_req_callback(const std_msgs::msg::String::SharedPtr msg);
   void goal_response_callback(
-	  const rclcpp_action::ClientGoalHandle<naosoccer_pos_interfaces::action::PosPlay>::SharedPtr& goal_handle);
-  void feedback_callback(rclcpp_action::ClientGoalHandle<naosoccer_pos_interfaces::action::PosPlay>::SharedPtr,
-						 const std::shared_ptr<const naosoccer_pos_interfaces::action::PosPlay::Feedback> feedback);
+	  const GoalHandlePosAction::SharedPtr& goal_handle);
+  void feedback_callback(GoalHandlePosAction::SharedPtr,
+						 const std::shared_ptr<const PosAction::Feedback> feedback);
   void
-  result_callback(const rclcpp_action::ClientGoalHandle<naosoccer_pos_interfaces::action::PosPlay>::WrappedResult& result);
+  result_callback(const GoalHandlePosAction::WrappedResult& result);
 
-  rclcpp_action::Client<naosoccer_pos_interfaces::action::PosPlay>::SharedPtr client_ptr_;
+  rclcpp_action::Client<PosAction>::SharedPtr client_ptr_;
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Subscription<std_msgs::msg::String>::SharedPtr sub_action_req_;
 

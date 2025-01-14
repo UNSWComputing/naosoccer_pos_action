@@ -51,7 +51,7 @@ NaosoccerPosActionServer::NaosoccerPosActionServer(const rclcpp::NodeOptions & o
       }
     });
 
-  action_server_ = rclcpp_action::create_server<naosoccer_pos_interfaces::action::PosPlay>(
+  action_server_ = rclcpp_action::create_server<PosAction>(
     this, "naosoccer_pos_action",
     std::bind(&NaosoccerPosActionServer::handleGoal, this, std::placeholders::_1, std::placeholders::_2),
     std::bind(&NaosoccerPosActionServer::handleCancel, this, std::placeholders::_1),
@@ -214,7 +214,7 @@ void NaosoccerPosActionServer::calculateEffectorJoints(
   //std::lock_guard<std::mutex> lock(mutex_);
 
   if (goal_handle_->is_canceling()) {
-    auto result = std::make_shared<naosoccer_pos_interfaces::action::PosPlay::Result>();
+    auto result = std::make_shared<PosAction::Result>();
     result->success = false;
     goal_handle_->canceled(result);
     RCLCPP_DEBUG(this->get_logger(), "pos action goal canceled");
@@ -226,7 +226,7 @@ void NaosoccerPosActionServer::calculateEffectorJoints(
   if (posFinished(time_ms)) {
     // We've finished the motion, set to DONE
     pos_in_action_ = false;
-    auto result = std::make_shared<naosoccer_pos_interfaces::action::PosPlay::Result>();
+    auto result = std::make_shared<PosAction::Result>();
     result->success = true;
     goal_handle_->succeed(result);
     RCLCPP_DEBUG(this->get_logger(), "Pos finished");
@@ -316,7 +316,7 @@ void NaosoccerPosActionServer::calculateEffectorJoints(
 
 rclcpp_action::GoalResponse NaosoccerPosActionServer::handleGoal(
   const rclcpp_action::GoalUUID & uuid,
-  std::shared_ptr<const naosoccer_pos_interfaces::action::PosPlay::Goal> goal)
+  std::shared_ptr<const PosAction::Goal> goal)
 {
   std::lock_guard<std::mutex> lock(mutex_);
 
@@ -338,7 +338,7 @@ rclcpp_action::GoalResponse NaosoccerPosActionServer::handleGoal(
 }
 
 rclcpp_action::CancelResponse NaosoccerPosActionServer::handleCancel(
-  const std::shared_ptr<rclcpp_action::ServerGoalHandle<naosoccer_pos_interfaces::action::PosPlay>>
+  const std::shared_ptr<rclcpp_action::ServerGoalHandle<PosAction>>
     goal_handle)
 {
   std::lock_guard<std::mutex> lock(mutex_);
@@ -350,7 +350,7 @@ rclcpp_action::CancelResponse NaosoccerPosActionServer::handleCancel(
 }
 
 void NaosoccerPosActionServer::handleAccepted(
-  const std::shared_ptr<rclcpp_action::ServerGoalHandle<naosoccer_pos_interfaces::action::PosPlay>>
+  const std::shared_ptr<rclcpp_action::ServerGoalHandle<PosAction>>
     goal_handle)
 {
   std::lock_guard<std::mutex> lock(mutex_);

@@ -29,7 +29,7 @@
 #include "nao_lola_command_msgs/msg/joint_indexes.hpp"
 #include "nao_lola_sensor_msgs/msg/joint_positions.hpp"
 
-#include "naosoccer_pos_interfaces/action/pos_play.hpp"
+#include "naosoccer_pos_interfaces/action/pos_action.hpp"
 #include "naosoccer_pos_action/key_frame.hpp"
 
 namespace naosoccer_pos_action_server_ns
@@ -38,6 +38,8 @@ namespace naosoccer_pos_action_server_ns
 class NaosoccerPosActionServer : public rclcpp::Node
 {
 public:
+  using PosAction = naosoccer_pos_action_interfaces::action::PosAction;
+
   explicit NaosoccerPosActionServer(const rclcpp::NodeOptions& options = rclcpp::NodeOptions{});
   virtual ~NaosoccerPosActionServer();
 
@@ -51,21 +53,21 @@ private:
   const KeyFrame& findPreviousKeyFrame(int time_ms);
   const KeyFrame& findNextKeyFrame(int time_ms);
   bool posFinished(int time_ms);
-  
+
   void calculateEffectorJoints(nao_lola_sensor_msgs::msg::JointPositions& sensor_joints);
 
   rclcpp_action::GoalResponse handleGoal(const rclcpp_action::GoalUUID& uuid,
-                                         std::shared_ptr<const naosoccer_pos_interfaces::action::PosPlay::Goal> goal);
+                                         std::shared_ptr<const PosAction::Goal> goal);
   rclcpp_action::CancelResponse
-  handleCancel(const std::shared_ptr<rclcpp_action::ServerGoalHandle<naosoccer_pos_interfaces::action::PosPlay>> goal_handle);
+  handleCancel(const std::shared_ptr<rclcpp_action::ServerGoalHandle<PosAction>> goal_handle);
   void handleAccepted(
-      const std::shared_ptr<rclcpp_action::ServerGoalHandle<naosoccer_pos_interfaces::action::PosPlay>> goal_handle);
+      const std::shared_ptr<rclcpp_action::ServerGoalHandle<PosAction>> goal_handle);
 
   rclcpp::Subscription<nao_lola_sensor_msgs::msg::JointPositions>::SharedPtr sub_joint_states_;
   rclcpp::Publisher<nao_lola_command_msgs::msg::JointPositions>::SharedPtr pub_joint_positions_;
   rclcpp::Publisher<nao_lola_command_msgs::msg::JointStiffnesses>::SharedPtr pub_joint_stiffnesses_;
 
-  rclcpp_action::Server<naosoccer_pos_interfaces::action::PosPlay>::SharedPtr action_server_;
+  rclcpp_action::Server<PosAction>::SharedPtr action_server_;
 
   std::string pos_folder_;
   bool file_successfully_read_ = false;
@@ -76,7 +78,7 @@ private:
   rclcpp::Time initial_time_;
   std::vector<uint8_t> selected_joints_;
 
-  std::shared_ptr<rclcpp_action::ServerGoalHandle<naosoccer_pos_interfaces::action::PosPlay>> goal_handle_;
+  std::shared_ptr<rclcpp_action::ServerGoalHandle<PosAction>> goal_handle_;
 
   std::mutex mutex_;
 };
