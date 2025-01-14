@@ -61,7 +61,7 @@ NaosoccerPosActionServer::NaosoccerPosActionServer(const rclcpp::NodeOptions & o
   bool parse_on_initialise;
   this->get_parameter<bool>("parse_on_initialise", parse_on_initialise);
   if (parse_on_initialise) {
-    if (canParsePosFolder()) {
+    if (canParsePosFolder(pos_folder_)) {
       RCLCPP_INFO(this->get_logger(), "Successfully parsed pos folder");
     } else {
       RCLCPP_ERROR(this->get_logger(), "Failed to parse pos folder");
@@ -75,10 +75,10 @@ NaosoccerPosActionServer::NaosoccerPosActionServer(const rclcpp::NodeOptions & o
 
 NaosoccerPosActionServer::~NaosoccerPosActionServer() {}
 
-bool NaosoccerPosActionServer::canParsePosFolder()
+bool NaosoccerPosActionServer::canParsePosFolder(std::string & folder_path)
 {
   try {
-    for (const auto &entry : fs::recursive_directory_iterator(pos_folder_)) {
+    for (const auto &entry : fs::recursive_directory_iterator(folder_path)) {
       if (entry.is_regular_file()) {
         std::string filePath = entry.path().string();
         bool isValid = parsePosFile(filePath);
@@ -100,9 +100,9 @@ bool NaosoccerPosActionServer::canParsePosFolder()
   return true;
 }
 
-bool NaosoccerPosActionServer::canParsePosFile(std::string & filePath)
+bool NaosoccerPosActionServer::canParsePosFile(std::string & file_path)
 {
-  std::ifstream ifstream(filePath);
+  std::ifstream ifstream(file_path);
   if (ifstream.is_open()) {
     auto lines = readLines(ifstream);
     auto parseResult = parser::parse(lines);
@@ -110,23 +110,23 @@ bool NaosoccerPosActionServer::canParsePosFile(std::string & filePath)
       return true;
     }
   } else {
-    RCLCPP_ERROR(this->get_logger(), ("Could not open file:  " + filePath).c_str());
+    RCLCPP_ERROR(this->get_logger(), ("Could not open file:  " + file_path).c_str());
   }
   return false;
 }
 
-void NaosoccerPosActionServer::readPosFile(std::string & filePath)
+void NaosoccerPosActionServer::readPosFile(std::string & file_path)
 {
-  std::ifstream ifstream(filePath);
+  std::ifstream ifstream(file_path);
   if (ifstream.is_open()) {
-    RCLCPP_DEBUG(this->get_logger(), ("Pos file succesfully loaded from " + filePath).c_str());
+    RCLCPP_DEBUG(this->get_logger(), ("Pos file succesfully loaded from " + file_path).c_str());
     file_successfully_read_ = true;
     auto lines = readLines(ifstream);
     auto parseResult = parser::parse(lines);
     file_successfully_read_ = parseResult.successful;
     key_frames_ = parseResult.keyFrames;
   } else {
-    RCLCPP_ERROR(this->get_logger(), ("Could not open file:  " + filePath).c_str());
+    RCLCPP_ERROR(this->get_logger(), ("Could not open file:  " + file_path).c_str());
     file_successfully_read_ = false;
   }
 }
