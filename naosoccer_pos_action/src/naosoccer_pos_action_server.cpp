@@ -211,25 +211,11 @@ bool NaosoccerPosActionServer::posFinished(int time_ms)
 void NaosoccerPosActionServer::calculateEffectorJoints(
   nao_lola_sensor_msgs::msg::JointPositions & sensor_joints)
 {
-  //std::lock_guard<std::mutex> lock(mutex_);
-
-  if (goal_handle_->is_canceling()) {
-    auto result = std::make_shared<PosAction::Result>();
-    result->success = false;
-    goal_handle_->canceled(result);
-    RCLCPP_DEBUG(this->get_logger(), "pos action goal canceled");
-    return;
-  }
-
   int time_ms = (rclcpp::Node::now() - initial_time_).nanoseconds() / 1e6;
 
   if (posFinished(time_ms)) {
     // We've finished the motion, set to DONE
-    pos_in_action_ = false;
-    auto result = std::make_shared<PosAction::Result>();
-    result->success = true;
-    goal_handle_->succeed(result);
-    RCLCPP_DEBUG(this->get_logger(), "Pos finished");
+    handlePosFinished();
     return;
   }
 
@@ -282,6 +268,11 @@ void NaosoccerPosActionServer::calculateEffectorJoints(
   pub_joint_stiffnesses->publish(nextKeyFrame.stiffnesses);
 }
 
+void NaosoccerPosActionServer::handlePosFinished() {
+  pos_in_action_ = false;
+  RCLCPP_DEBUG(this->get_logger(), "Pos finished");
+}
+
 rclcpp_action::GoalResponse NaosoccerPosActionServer::handle_goal(
   const rclcpp_action::GoalUUID & uuid,
   std::shared_ptr<const PosAction::Goal> goal)
@@ -306,28 +297,57 @@ rclcpp_action::GoalResponse NaosoccerPosActionServer::handle_goal(
 }
 
 rclcpp_action::CancelResponse NaosoccerPosActionServer::handle_cancel(
-  const std::shared_ptr<rclcpp_action::ServerGoalHandle<PosAction>>
+  const std::shared_ptr<ServerGoalHandlePosAction>
     goal_handle)
 {
   std::lock_guard<std::mutex> lock(mutex_);
   RCLCPP_INFO(get_logger(), "Received request to cancel goal");
   (void)goal_handle;
   pos_in_action_ = false;
-  goal_handle_.reset();
   return rclcpp_action::CancelResponse::ACCEPT;
 }
 
-void NaosoccerPosActionServer::handle_accepted(
-  const std::shared_ptr<rclcpp_action::ServerGoalHandle<PosAction>>
-    goal_handle)
+void NaosoccerPosActionServer::handle_accepted(const std::shared_ptr<ServerGoalHandlePosAction> goal_handle)
 {
-  std::lock_guard<std::mutex> lock(mutex_);
+  std::thread([this, goal_handle]() {execute(goal_handle);}).detach();
+}
+
+void KickServer::execute(const std::shared_ptr<GoalHandleKick> goal_handle)
+{
   RCLCPP_INFO(this->get_logger(), "Starting Pos Action");
   initial_time_ = rclcpp::Node::now();
   pos_in_action_ = true;
   firstTickSinceActionStarted_ = true;
-  selected_joints_.clear();  // std::vector<uint8_t>
-  goal_handle_ = goal_handle;
+
+  auto feedback = std::make_shared<PosAction::Feedback>();
+  auto result = std::make_shared<PosAction::Result>();
+
+  while (pos_in_action_ && rclcpp::ok()) {
+    if (goal_handle->is_canceling()) {
+      result->success = false;
+      result->message = "pos action was canceled.";
+      goal_handle->canceled(result);
+      RCLCPP_DEBUG(this->get_logger(), "pos action goal canceled");
+      return;
+    }
+
+    // feedback->progress = i;
+    // feedback->cancel_possible = true;
+    // goal_handle->publish_feedback(feedback);
+    // RCLCPP_INFO(this->get_logger(), "Feedback: progress = %d%%", feedback->progress);
+    // std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  }
+  if (rclcpp::ok()) {
+    result->success = true;
+    result->message = "Pos action completed successfully";
+    goal_handle->succeed(result);
+    RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+  } else {
+    result->success = false;
+    result->message = "pos action was aborted.";
+    goal_handle->abort(result);
+    RCLCPP_ERROR(this->get_logger(), "Goal aborted");
+  }
 }
 
 }  // namespace naosoccer_pos_action_server_ns
