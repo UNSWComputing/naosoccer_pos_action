@@ -80,9 +80,9 @@ bool NaosoccerPosActionServer::canParsePosFolder(std::string & folder_path)
 {
   try {
     for (const auto &entry : fs::recursive_directory_iterator(folder_path)) {
-      if (entry.is_regular_file()) {
+      if (std::filesystem::is_regular_file(entry)) {
         std::string filePath = entry.path().string();
-        bool isValid = parsePosFile(filePath);
+        bool isValid = canParsePosFile(filePath);
         if (isValid) {
             RCLCPP_DEBUG(this->get_logger(), ("Valid pos file: " + filePath).c_str());
         } else {
@@ -92,10 +92,10 @@ bool NaosoccerPosActionServer::canParsePosFolder(std::string & folder_path)
       }
     }
   } catch (const fs::filesystem_error &e) {
-      RCLCPP_ERROR(this->get_logger(), "Filesystem error" + e.what().c_str());
+      RCLCPP_ERROR(this->get_logger(), "Filesystem error" + e.what());
       return false;
   } catch (const std::exception &e) {
-      RCLCPP_ERROR(this->get_logger(), "Error: " + e.what().c_str());
+      RCLCPP_ERROR(this->get_logger(), "Error: " + e.what());
       return false;
   }
   return true;

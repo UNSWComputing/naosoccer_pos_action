@@ -37,7 +37,7 @@ NaosoccerPosActionNode::NaosoccerPosActionNode(const rclcpp::NodeOptions & optio
 : rclcpp::Node{"NaosoccerPosActionNode", options}
 {
   this->action_req_sub_ = this->create_subscription<std_msgs::msg::String>(
-    "action_req", 1, std::bind(&NaosoccerPosActionClient::action_req_callback, this, _1));
+    "action_req", 1, std::bind(&NaosoccerPosActionNode::action_req_callback, this, std::placeholders::_1));
 
   this->action_finished_pub_ = this->create_publisher<std_msgs::msg::String>("action_finished", 10);
 
