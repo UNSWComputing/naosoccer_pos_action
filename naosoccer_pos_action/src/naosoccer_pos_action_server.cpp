@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "naosoccer_pos_action/naosoccer_pos_action_server.hpp"
+#include "nao_lola_command_msgs/msg/joint_indexes.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -388,7 +389,7 @@ void NaosoccerPosActionServer::unsetPosFinishedCallback()
   pos_finished_callback_ = nullptr;
 }
 
-}  // namespace naosoccer_pos_action_server_ns
+}  // namespace naosoccer_pos_action_server
 
 #include "rclcpp_components/register_node_macro.hpp"
 RCLCPP_COMPONENTS_REGISTER_NODE(naosoccer_pos_action_server::NaosoccerPosActionServer)

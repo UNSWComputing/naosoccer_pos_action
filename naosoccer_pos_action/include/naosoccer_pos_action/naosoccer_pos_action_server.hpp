@@ -18,16 +18,13 @@
 
 #include <memory>
 #include <string>
-#include <utility>
 #include <vector>
 
-#include "rclcpp/node.hpp"
 #include "rclcpp/time.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 
 #include "nao_lola_command_msgs/msg/joint_positions.hpp"
 #include "nao_lola_command_msgs/msg/joint_stiffnesses.hpp"
-#include "nao_lola_command_msgs/msg/joint_indexes.hpp"
 #include "nao_lola_sensor_msgs/msg/joint_positions.hpp"
 
 #include "naosoccer_pos_action_interfaces/action/pos_action.hpp"
