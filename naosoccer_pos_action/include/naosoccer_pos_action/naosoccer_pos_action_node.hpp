@@ -30,7 +30,7 @@
 #include "rclcpp/node.hpp"
 #include "rclcpp/time.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
-#include "naosoccer_pos_action_interfaces/action/action.hpp"
+#include "naosoccer_pos_action_interfaces/action/pos_action.hpp"
 
 
 namespace naosoccer_pos_action_node
@@ -49,7 +49,7 @@ private:
 
 // Client
 public:
-  using PosAction = naosoccer_pos_interfaces::action::PosAction;
+  using PosAction = naosoccer_pos_action_interfaces::action::PosAction;
   using ClientGoalHandlePosAction = rclcpp_action::ClientGoalHandle<PosAction>;
 
   rclcpp_action::Client<PosAction>::SharedPtr client_ptr_;

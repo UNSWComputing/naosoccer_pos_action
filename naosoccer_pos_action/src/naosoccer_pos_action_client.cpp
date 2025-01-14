@@ -26,7 +26,7 @@
 #include "nao_lola_command_msgs/msg/joint_indexes.hpp"
 #include "nao_lola_command_msgs/msg/joint_positions.hpp"
 #include "nao_lola_command_msgs/msg/joint_stiffnesses.hpp"
-#include "naosoccer_pos_interfaces/action/pos_action.hpp"
+#include "naosoccer_pos_action_interfaces/action/pos_action.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "rclcpp_components/register_node_macro.hpp"

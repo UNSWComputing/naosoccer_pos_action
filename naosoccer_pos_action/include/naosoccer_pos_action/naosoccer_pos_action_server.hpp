@@ -30,7 +30,7 @@
 #include "nao_lola_command_msgs/msg/joint_indexes.hpp"
 #include "nao_lola_sensor_msgs/msg/joint_positions.hpp"
 
-#include "naosoccer_pos_interfaces/action/pos_action.hpp"
+#include "naosoccer_pos_action_interfaces/action/pos_action.hpp"
 #include "naosoccer_pos_action/key_frame.hpp"
 
 namespace naosoccer_pos_action_server

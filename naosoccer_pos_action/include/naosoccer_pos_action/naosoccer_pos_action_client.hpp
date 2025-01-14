@@ -33,7 +33,7 @@
 #include "nao_lola_command_msgs/msg/joint_indexes.hpp"
 #include "nao_lola_command_msgs/msg/joint_stiffnesses.hpp"
 
-#include "naosoccer_pos_interfaces/action/pos_action.hpp"
+#include "naosoccer_pos_action_interfaces/action/pos_action.hpp"
 #include "std_msgs/msg/string.hpp"
 
 namespace fs = boost::filesystem;
@@ -44,7 +44,7 @@ namespace naosoccer_pos_action_node
 class NaosoccerPosActionClient
 {
 public:
-  using PosAction = naosoccer_pos_interfaces::action::PosAction;
+  using PosAction = naosoccer_pos_action_interfaces::action::PosAction;
   using ClientGoalHandlePosAction = rclcpp_action::ClientGoalHandle<PosAction>;
 
 
