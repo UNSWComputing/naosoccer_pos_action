@@ -41,20 +41,16 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
 # Build Node
 add_library(naosoccer_pos_action_node SHARED
   src/naosoccer_pos_action_node.cpp
-  src/naosoccer_pos_action_client.cpp
-  src/parser.cpp)
+  src/naosoccer_pos_action_client.cpp)
 target_include_directories(naosoccer_pos_action_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
 rclcpp_components_register_node(naosoccer_pos_action_node
   PLUGIN "naosoccer_pos_action_node::NaosoccerPosActionNode"
-  EXECUTABLE naosoccer_pos_action_node)
+  EXECUTABLE naosoccer_pos_action_node_exec)
 
 ament_target_dependencies(naosoccer_pos_action_node ${THIS_PACKAGE_INCLUDE_DEPENDS})
-
-ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
-ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
 
 # Build Server
 add_library(naosoccer_pos_action_server SHARED
@@ -65,8 +61,8 @@ target_include_directories(naosoccer_pos_action_server PUBLIC
   $<INSTALL_INTERFACE:include>)
 
 rclcpp_components_register_node(naosoccer_pos_action_server
-  PLUGIN "naosoccer_pos_action_server::NaosoccerPosActionServer"
-  EXECUTABLE naosoccer_pos_action_server)
+  PLUGIN "naosoccer_pos_action::NaosoccerPosActionServer"
+  EXECUTABLE naosoccer_pos_action_server_exec)
 
 ament_target_dependencies(naosoccer_pos_action_server ${THIS_PACKAGE_INCLUDE_DEPENDS})
 
