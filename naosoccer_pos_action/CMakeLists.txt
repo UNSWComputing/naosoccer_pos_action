@@ -49,7 +49,7 @@ target_include_directories(naosoccer_pos_action_node PUBLIC
 
 rclcpp_components_register_node(naosoccer_pos_action_node
   PLUGIN "naosoccer_pos_action::NaosoccerPosActionNode"
-  EXECUTABLE naosoccer_pos_action)
+  EXECUTABLE naosoccer_pos_action_node)
 
 ament_target_dependencies(naosoccer_pos_action_node ${THIS_PACKAGE_INCLUDE_DEPENDS})
 
@@ -66,7 +66,7 @@ target_include_directories(naosoccer_pos_action_server PUBLIC
 
 rclcpp_components_register_node(naosoccer_pos_action_server
   PLUGIN "nao_pos_action_server::NaoPosActionServer"
-  EXECUTABLE nao_pos_action_server)
+  EXECUTABLE naosoccer_pos_action_server)
 
 ament_target_dependencies(naosoccer_pos_action_server ${THIS_PACKAGE_INCLUDE_DEPENDS})
 
