@@ -61,7 +61,7 @@ target_include_directories(naosoccer_pos_action_server PUBLIC
   $<INSTALL_INTERFACE:include>)
 
 rclcpp_components_register_node(naosoccer_pos_action_server
-  PLUGIN "naosoccer_pos_action::NaosoccerPosActionServer"
+  PLUGIN "naosoccer_pos_action_server::NaosoccerPosActionServer"
   EXECUTABLE naosoccer_pos_action_server_exec)
 
 ament_target_dependencies(naosoccer_pos_action_server ${THIS_PACKAGE_INCLUDE_DEPENDS})
