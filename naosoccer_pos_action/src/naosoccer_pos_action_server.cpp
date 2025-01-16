@@ -65,6 +65,7 @@ NaosoccerPosActionServer::NaosoccerPosActionServer(const rclcpp::NodeOptions & o
   if (!pos_folder_.empty() && pos_folder_.back() == '/') {
     pos_folder_.pop_back();
   }
+  pos_folder_.push_back('/');
   bool parse_on_initialise;
   this->get_parameter<bool>("parse_on_initialise", parse_on_initialise);
   if (parse_on_initialise) {
