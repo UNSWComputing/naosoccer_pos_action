@@ -359,6 +359,7 @@ void NaosoccerPosActionServer::execute(const std::shared_ptr<ServerGoalHandlePos
       result->message = "Pos action completed successfully";
       goal_handle->succeed(result);
       RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+      return;
     };
 
   setPosFinishedCallback(pos_finished_callback);
@@ -377,22 +378,17 @@ void NaosoccerPosActionServer::execute(const std::shared_ptr<ServerGoalHandlePos
     const auto pos_time = key_frames_.back().t_ms;
     feedback->progress = time_ms / pos_time;
     goal_handle->publish_feedback(feedback);
-    RCLCPP_INFO(this->get_logger(), "Feedback: progress = %d%%", feedback->progress);
+    RCLCPP_INFO(this->get_logger(), "Feedback: progress = %d%%", feedback->progress * 100);
 
     loop_rate.sleep();
   }
-  if (rclcpp::ok()) {
-    result->success = true;
-    result->message = "Pos action completed successfully";
-    goal_handle->succeed(result);
-    RCLCPP_INFO(this->get_logger(), "Goal succeeded");
-  } else {
-    result->success = false;
-    result->message = "pos action was aborted.";
-    goal_handle->abort(result);
-    unsetPosFinishedCallback();
-    RCLCPP_ERROR(this->get_logger(), "Goal aborted");
-  }
+  // if it reaches here, pos_in_action_ is false but effector 
+  result->success = false;
+  result->message = "pos action was aborted.";
+  goal_handle->abort(result);
+  unsetPosFinishedCallback();
+  RCLCPP_ERROR(this->get_logger(), "Goal aborted");
+  return;
 }
 
 void NaosoccerPosActionServer::setPosFinishedCallback(std::function<void()> callback)
