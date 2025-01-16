@@ -35,10 +35,13 @@ Pos files define the different motions, and can be specified using a different a
 
 ## Using custom motions.
 To use custom motions, you can set a parameter to define the filepath to a custom pos folder. 
-To set the parameter, when running the naosoccer_pos_action_server in the steps above, instead do the following:
+To set the parameter, when running the naosoccer_pos_action_server in the steps above, instead do either of the following:
 
 ```
-ros2 run naosoccer_pos_action naosoccer_pos_action_server --ros-args -p "pos_folder:=/path-to-your-folder/pos/"
+ros2 run naosoccer_pos_action naosoccer_pos_action_server --ros-args -p "pos_folder:=/absolute-path-to-your-folder/pos/"
+```
+```
+ros2 run naosoccer_pos_action naosoccer_pos_action_server --ros-args -p "pos_folder:=relative-path-to-your-folder-from-naosoccer_pos_action/pos/"
 ```
 
 By default, upon the server initialisation it will attempt to parse all pos files recursively in the given folder to ensure they are the correct format. You can disable this with the parameter parse_on_initalise by running
