@@ -23,8 +23,6 @@
 #include <utility>
 #include <memory>
 
-namespace fs = boost::filesystem;
-
 namespace naosoccer_pos_action_node
 {
 
