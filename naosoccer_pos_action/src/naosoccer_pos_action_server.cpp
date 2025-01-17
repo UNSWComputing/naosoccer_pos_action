@@ -287,16 +287,13 @@ void NaosoccerPosActionServer::calculateEffectorJoints(
 
 void NaosoccerPosActionServer::handlePosFinished()
 {
-  pos_in_action_ = false;
   RCLCPP_DEBUG(this->get_logger(), "Pos finished");
 
   std::function<void()> callback;
-
-  {
-    std::lock_guard<std::mutex> lock(mutex_);
-    callback = std::move(pos_finished_callback_);
-    unsetPosFinishedCallback();
-  }
+  
+  std::lock_guard<std::mutex> lock(mutex_);
+  callback = std::move(pos_finished_callback_);
+  unsetPosFinishedCallback();
 
   if (callback) {
     callback();
@@ -355,12 +352,13 @@ void NaosoccerPosActionServer::execute(const std::shared_ptr<ServerGoalHandlePos
   auto result = std::make_shared<PosAction::Result>();
 
   auto pos_finished_callback = [this, goal_handle, result]() {
-      result->success = true;
-      result->message = "Pos action completed successfully";
-      goal_handle->succeed(result);
-      RCLCPP_INFO(this->get_logger(), "Goal succeeded");
-      return;
-    };
+    pos_in_action_ = false;
+    result->success = true;
+    result->message = "Pos action completed successfully";
+    goal_handle->succeed(result);
+    RCLCPP_INFO(this->get_logger(), "Goal succeeded");
+    return;
+  };
 
   setPosFinishedCallback(pos_finished_callback);
 
@@ -377,8 +375,8 @@ void NaosoccerPosActionServer::execute(const std::shared_ptr<ServerGoalHandlePos
     int time_ms = (rclcpp::Node::now() - initial_time_).nanoseconds() / 1e6;
     const auto pos_time = key_frames_.back().t_ms;
     feedback->progress = time_ms / pos_time;
+    RCLCPP_INFO(this->get_logger(), "Feedback: progress = %f%%", feedback->progress * 100);
     goal_handle->publish_feedback(feedback);
-    RCLCPP_INFO(this->get_logger(), "Feedback: progress = %d%%", feedback->progress * 100);
 
     loop_rate.sleep();
   }
